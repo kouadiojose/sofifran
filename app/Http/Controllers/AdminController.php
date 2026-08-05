@@ -72,13 +72,39 @@ class AdminController extends Controller
 	}
 
 
-    private function uniqueSlug(string $base, string $model, string $column = 'slug'): string
+	/**
+	 * Upload d'un document (PDF, Word...) sans passer par Intervention Image
+	 * (qui ne sait lire que des images et plantait sur les PDF).
+	 * Retourne le chemin public complet du fichier.
+	 */
+	private function uploadDocument(UploadedFile $file, string $relativePath): string
+	{
+	    $ext = strtolower($file->getClientOriginalExtension());
+	    if (!in_array($ext, ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'])) {
+	        $ext = 'pdf';
+	    }
+	    $name = time() . '_' . uniqid() . '.' . $ext;
+
+	    $relativePath = '/' . trim($relativePath, '/') . '/';
+	    $destinationPath = public_path($relativePath);
+	    if (!is_dir($destinationPath)) {
+	        @mkdir($destinationPath, 0775, true);
+	    }
+
+	    $file->move($destinationPath, $name);
+
+	    return $relativePath . $name;
+	}
+
+    private function uniqueSlug(string $base, string $model, string $column = 'slug', ?int $ignoreId = null): string
     {
         $baseSlug = Str::slug($base);
         $slug     = $baseSlug;
         $i        = 1;
 
-        while ($model::where($column, $slug)->exists()) {
+        while ($model::where($column, $slug)
+            ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+            ->exists()) {
             $slug = $baseSlug . '-' . $i;
             $i++;
         }
@@ -90,15 +116,26 @@ class AdminController extends Controller
         $countPorjetCours = Projet::where('ended', 'no')->count();
         $countPorjetEnd   = Projet::where('ended', 'yes')->count();
         $countActivite    = Activite::count();
-        $countPub         = Popup::count();
-        $projets          = Projet::all();
+        // L'ancien code comptait les popups sous l'etiquette "Publications".
+        $countPub         = Publication::count();
+
+        $countContacts    = Contact::count();
+        $countInfolettre  = Infolettre::count();
+        $countTemoignages = Temoignage::count();
+        $countEvenements  = Atelier::where('start', '>=', now()->format('Y-m-d'))->count();
+
+        $derniersContacts = Contact::latest()->take(5)->get();
 
         return view('admin.dashboard')
             ->with('countPorjetEnd', $countPorjetEnd)
             ->with('countPorjetCours', $countPorjetCours)
             ->with('countActivite', $countActivite)
             ->with('countPub', $countPub)
-            ->with('projets', $projets);
+            ->with('countContacts', $countContacts)
+            ->with('countInfolettre', $countInfolettre)
+            ->with('countTemoignages', $countTemoignages)
+            ->with('countEvenements', $countEvenements)
+            ->with('derniersContacts', $derniersContacts);
     }
 
     /** --------------------------------
@@ -202,7 +239,7 @@ class AdminController extends Controller
             'image'          => $name,
             'description_fr' => $request->description_fr,
             'description_en' => $request->description_en,
-            'slug' => $this->uniqueSlug($request->titre_fr, Projet::class, 'slug'),
+            'slug' => $this->uniqueSlug($request->titre_fr, Projet::class, 'slug', (int) $request->id),
         ]);
 
         // Nouvelles images partenaires
@@ -721,6 +758,9 @@ class AdminController extends Controller
             'logo'     => $name,
         ]);
 
+        // Le header/footer du site utilisent ces valeurs en cache.
+        \Illuminate\Support\Facades\Cache::forget('site_settings');
+
         $request->session()->flash('msg', 'Votre modification a été effectuée avec succès!');
         return back();
     }
@@ -794,7 +834,7 @@ class AdminController extends Controller
             'image'          => $name,
             'description_fr' => $request->description_fr,
             'description_en' => $request->description_en,
-            'slug'           => $this->uniqueSlug($request->title_fr, Blog::class, 'slug'),
+            'slug'           => $this->uniqueSlug($request->title_fr, Blog::class, 'slug', (int) $request->id),
         ]);
 
         $request->session()->flash('msg', 'Vous avez modifié un blog avec succès!');
@@ -851,75 +891,46 @@ class AdminController extends Controller
     public function EditGalerie($id)
     {
         $activites = Activite::latest()->get();
-        $galerie   = Galerie_photo::where('id', $id)->first();
-
-        $img = DB::table('sous_activites')
-            ->where('activite_id', $id)
-            ->get();
-
-        $video = DB::table('video_activites')
-            ->where('activite_id', $id)
-            ->get();
+        $galerie   = Galerie_photo::findOrFail($id);
 
         return view('admin.galeries.edit')
             ->with('galerie', $galerie)
-            ->with('activites', $activites)
-            ->with('video', $video)
-            ->with('img', $img);
+            ->with('activites', $activites);
     }
 
     public function EditvalidGalerie(Request $request)
     {
-        $name = ($request->hasFile('image'))
-            ? $this->uploadImage($request->file('image'), '/frontend/assets/images/gallery/photos/', 850, 550)
-            : $request->img_up;
-
-        // NOTE : le code d’origine met à jour le modèle "Galerie" (pas Galerie_photo).
-        // Je conserve la logique initiale.
-        Galerie::where('id', $request->id)->update([
-            'image'           => $name,
-            'title_fr'        => $request->title_fr,
-            'title_en'        => $request->title_en,
-            'description_en'  => $request->description_en,
-            'description_fr'  => $request->description_fr,
-            'slug_fr'         => Str::slug($request->title_fr),
-            'slug_en'         => Str::slug($request->title_en),
+        // L'ancien code mettait a jour le modele "Galerie" (table galeries)
+        // alors que la liste affiche des enregistrements de galerie_photos :
+        // l'edition ne fonctionnait pas.
+        $request->validate([
+            'id'       => ['required', 'integer'],
+            'activite' => ['required', 'integer'],
+            'image'    => ['nullable', 'image', 'max:8192'],
         ]);
 
-        $date = now()->format('Y-m-d');
+        $photo = Galerie_photo::findOrFail($request->id);
 
-        if (!empty($request->img)) {
-            foreach ($request->img as $value) {
-                $files = $this->uploadImage($value, '/frontend/assets/images/gallery/sous_galerie/', 850, 800);
+        $name = ($request->hasFile('image'))
+            ? $this->uploadImage($request->file('image'), '/frontend/assets/images/gallery/photos/', 850, 550)
+            : $photo->image;
 
-                DB::table('sous_activites')->insert([
-                    'image'       => $files,
-                    'activite_id' => $request->id,
-                    'created_at'  => $date,
-                    'updated_at'  => $date,
-                ]);
-            }
-        }
+        $photo->update([
+            'image'      => $name,
+            'galerie_id' => $request->activite,
+        ]);
 
-        if (!empty($request->videos)) {
-            foreach ($request->videos as $video) {
-                DB::table('video_activites')->insert([
-                    'lien'        => $video,
-                    'activite_id' => $request->id,
-                    'created_at'  => $date,
-                    'updated_at'  => $date,
-                ]);
-            }
-        }
-
-        $request->session()->flash('msg', 'Vous avez modifié une activité avec succès!');
+        $request->session()->flash('msg', 'Vous avez modifié la photo avec succès!');
         return back();
     }
 
     public function DelGalerie(Request $request)
     {
-        Galerie::findOrFail($request->del_id)->delete();
-        $request->session()->flash('msg', 'Vous avez supprimé une activité avec succès!');
+        // L'ancien code supprimait dans la table "galeries" alors que la
+        // liste affiche des photos (galerie_photos) : la suppression visait
+        // le mauvais enregistrement.
+        Galerie_photo::findOrFail($request->del_id)->delete();
+        $request->session()->flash('msg', 'Vous avez supprimé la photo avec succès!');
         return back();
     }
 
@@ -938,10 +949,26 @@ class AdminController extends Controller
             ->with('videos', $videos);
     }
 
+    /**
+     * Extrait l'identifiant d'une video YouTube quel que soit le format
+     * colle par l'admin : watch?v=ID, youtu.be/ID, embed/ID ou ID brut.
+     */
+    private function extractYoutubeId(string $url): string
+    {
+        $url = trim($url);
+
+        if (preg_match('/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/', $url, $m)) {
+            return $m[1];
+        }
+
+        // Dernier segment de l'URL (comportement historique), sans querystring.
+        $last = substr($url, strrpos($url, '/') + 1);
+        return strtok($last, '?&') ?: $last;
+    }
+
     public function GalerieVideoCreate(Request $request)
     {
-        $str            = trim($request->link_video);
-        $last_word      = substr($str, strrpos($str, '/') + 1);
+        $last_word = $this->extractYoutubeId($request->link_video);
 
         $name = $this->uploadImage($request->file('image_video'), '/frontend/assets/images/gallery/video/', 850, 550);
 
@@ -960,8 +987,7 @@ class AdminController extends Controller
 
     public function GalerieVideoEdit(Request $request)
     {
-        $str        = trim($request->link_video);
-        $last_word  = substr($str, strrpos($str, '/') + 1);
+        $last_word = $this->extractYoutubeId($request->link_video);
 
         $name = ($request->hasFile('image_video'))
             ? $this->uploadImage($request->file('image_video'), '/frontend/assets/images/gallery/video/', 850, 550)
@@ -1149,9 +1175,7 @@ class AdminController extends Controller
             'description_en'          => $request->description_en,
             'description_fr'          => $request->description_fr,
             'categorie_activity_slug' => $request->type,
-            // Si tu veux régénérer le slug à l’édition :
-            // 'slug' => $this->uniqueSlug($request->title_fr, Activite::class, 'slug'),
-            'slug'                    => Str::slug($request->title_fr),
+            'slug'                    => $this->uniqueSlug($request->title_fr, Activite::class, 'slug', (int) $request->id),
         ]);
 
         $request->session()->flash('msg', 'Vous avez modifié une activité avec succès!');
@@ -1162,6 +1186,108 @@ class AdminController extends Controller
     {
         Activite::findOrFail($request->del_id)->delete();
         $request->session()->flash('msg', 'Vous avez supprimé une activité avec succès!');
+        return back();
+    }
+
+    /** --------------------------------
+     *     CATEGORIES D'ACTIVITES
+     * --------------------------------*/
+    public function categories()
+    {
+        $categories = Categorie_activitie::withCount('activites')->orderBy('id', 'ASC')->get();
+
+        return view('admin.main-activity.index')
+            ->with('categories', $categories);
+    }
+
+    public function categorieCreate()
+    {
+        return view('admin.main-activity.create');
+    }
+
+    public function categorieCreateValid(Request $request)
+    {
+        $request->validate([
+            'titre_fr'       => ['required', 'string'],
+            'titre_en'       => ['required', 'string'],
+            'description_fr' => ['required', 'string'],
+            'description_en' => ['required', 'string'],
+            'image'          => ['required', 'image', 'max:8192'],
+        ]);
+
+        $name = $this->uploadImage($request->file('image'), '/frontend/assets/images/activites/categories/', 850, 550);
+
+        Categorie_activitie::create([
+            'titre_fr'       => $request->titre_fr,
+            'titre_en'       => $request->titre_en,
+            'description_fr' => $request->description_fr,
+            'description_en' => $request->description_en,
+            'image'          => $name,
+            'slug'           => $this->uniqueSlug($request->titre_fr, Categorie_activitie::class, 'slug'),
+        ]);
+
+        $request->session()->flash('msg', 'Vous avez ajouté une catégorie avec succès!');
+        return back();
+    }
+
+    public function categorieEdit($id)
+    {
+        $categorie = Categorie_activitie::findOrFail($id);
+
+        return view('admin.main-activity.edit')
+            ->with('categorie', $categorie);
+    }
+
+    public function categorieEditValid(Request $request)
+    {
+        $request->validate([
+            'titre_fr'       => ['required', 'string'],
+            'titre_en'       => ['required', 'string'],
+            'description_fr' => ['required', 'string'],
+            'description_en' => ['required', 'string'],
+            'image'          => ['nullable', 'image', 'max:8192'],
+        ]);
+
+        $categorie = Categorie_activitie::findOrFail($request->categorie_id);
+
+        $name = ($request->hasFile('image'))
+            ? $this->uploadImage($request->file('image'), '/frontend/assets/images/activites/categories/', 850, 550)
+            : $categorie->image;
+
+        $newSlug = $this->uniqueSlug($request->titre_fr, Categorie_activitie::class, 'slug', (int) $categorie->id);
+        $oldSlug = $categorie->slug;
+
+        $categorie->update([
+            'titre_fr'       => $request->titre_fr,
+            'titre_en'       => $request->titre_en,
+            'description_fr' => $request->description_fr,
+            'description_en' => $request->description_en,
+            'image'          => $name,
+            'slug'           => $newSlug,
+        ]);
+
+        // Les activites referencent la categorie par son slug : on les met a
+        // jour pour ne pas casser la liaison quand le titre change.
+        if ($oldSlug !== $newSlug) {
+            Activite::where('categorie_activity_slug', $oldSlug)
+                ->update(['categorie_activity_slug' => $newSlug]);
+        }
+
+        $request->session()->flash('msg', 'Vous avez modifié la catégorie avec succès!');
+        return back();
+    }
+
+    public function categorieDel(Request $request)
+    {
+        $categorie = Categorie_activitie::findOrFail($request->del_id);
+
+        if ($categorie->activites()->exists()) {
+            $request->session()->flash('msg_error', 'Impossible de supprimer cette catégorie : des activités y sont encore rattachées. Déplacez-les d\'abord vers une autre catégorie.');
+            return back();
+        }
+
+        $categorie->delete();
+        $request->session()->flash('msg', 'Vous avez supprimé la catégorie avec succès!');
         return back();
     }
 
@@ -1561,14 +1687,22 @@ class AdminController extends Controller
 
     public function publicationCreateValid(Request $request)
     {
-        // Pas de resize spécifié dans le code source original
-        $fileName = $this->uploadImage($request->file('file_name'), '/frontend/assets/images/publication/', 0, 0);
+        $request->validate([
+            'titre_fr'  => ['required', 'string'],
+            'titre_en'  => ['required', 'string'],
+            'date_pub'  => ['required', 'date'],
+            'type'      => ['required', 'in:' . implode(',', array_keys(Publication::TYPES))],
+            'file_name' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:20480'],
+        ]);
+
+        $filePath = $this->uploadDocument($request->file('file_name'), '/frontend/assets/docs/publications/');
 
         Publication::create([
             'titre_fr' => $request->titre_fr,
             'titre_en' => $request->titre_en,
             'date_pub' => $request->date_pub,
-            'doc'      => $fileName,
+            'type'     => $request->type,
+            'doc'      => $filePath,
         ]);
 
         $request->session()->flash('msg', 'Vous avez ajouté une publication avec succès!');
@@ -1584,14 +1718,23 @@ class AdminController extends Controller
 
     public function publicationEditValid(Request $request)
     {
+        $request->validate([
+            'titre_fr'  => ['required', 'string'],
+            'titre_en'  => ['required', 'string'],
+            'date_pub'  => ['required', 'date'],
+            'type'      => ['required', 'in:' . implode(',', array_keys(Publication::TYPES))],
+            'file_name' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:20480'],
+        ]);
+
         $fileName = ($request->hasFile('file_name'))
-            ? $this->uploadImage($request->file('file_name'), '/frontend/assets/images/publication/', 0, 0)
+            ? $this->uploadDocument($request->file('file_name'), '/frontend/assets/docs/publications/')
             : $request->file_name_up;
 
         Publication::where('id', $request->pub_id)->update([
             'titre_fr' => $request->titre_fr,
             'titre_en' => $request->titre_en,
             'date_pub' => $request->date_pub,
+            'type'     => $request->type,
             'doc'      => $fileName,
         ]);
 

@@ -36,7 +36,15 @@ class PageController extends Controller
     {
         // Seules les donnees reellement affichees par pages/index.blade.php
         // sont chargees ici (l'ancienne version executait ~10 requetes inutilisees).
-        $popup = Popup::where('id', 1)->first();
+
+        // Popup actif : celui dont la periode start/end couvre la date du jour
+        // (avant, le popup id=1 etait affiche en permanence quelles que soient
+        // les dates configurees dans l'admin).
+        $today = now()->format('Y-m-d');
+        $popup = Popup::whereDate('start', '<=', $today)
+            ->whereDate('end', '>=', $today)
+            ->orderBy('id', 'DESC')
+            ->first();
 
         $projets = Projet::where('ended', 'no')->orderBy('id', 'DESC')->paginate(4);
 
@@ -100,14 +108,15 @@ class PageController extends Controller
     public function infolettre()
     {
 
-        return view('pages.infolettre');
+        return view('pages.infolettre')
+        ->with('pubs', Publication::where('type', 'infolettre')->orderBy('date_pub', 'DESC')->get());
 
     }
     
     
     public function atelier()
     {
-        $baniere = Baniere::Where('id', 9)->first();
+        $baniere = Baniere::forPage('atelier');
 
         //$data = Atelier::all();
         $data = Atelier::where('start', '>=', now())->orderBy('start', 'ASC')->get();
@@ -122,7 +131,7 @@ class PageController extends Controller
 
     public function Detailatelier($slug)
     {
-        $baniere = Baniere::Where('id', 9)->first();
+        $baniere = Baniere::forPage('atelier');
         $atelier = Atelier::Where('slug', $slug)
         ->firstOrFail();
         $ateliers = Atelier::where('start', '>=', now())->orderBy('start', 'ASC')->get();        
@@ -138,7 +147,7 @@ class PageController extends Controller
     public function partenaire()
     {
 
-        $baniere = Baniere::Where('id', 7)->first();
+        $baniere = Baniere::forPage('partenaire');
 
         $partenaireFinance = DB::table('partenaires')->where('type', 'financier')->orderBy('orders', 'asc')->get();
         $partenaireCommunautaire = DB::table('partenaires')->where('type', 'communautaire')->orderBy('orders', 'asc')->get();
@@ -159,7 +168,7 @@ class PageController extends Controller
     public function GalerieVideo()
     {
 
-        $baniere = Baniere::Where('id', 15)->first();
+        $baniere = Baniere::forPage('galerie-video');
         $videos = Galerie_video::latest()->paginate(9);
 
         return view('pages.galerie_video')
@@ -173,7 +182,7 @@ class PageController extends Controller
     public function GaleriePhoto()
 
     {
-        $baniere = Baniere::Where('id', 14)->first();
+        $baniere = Baniere::forPage('galerie-photo');
 
         $galerie = Galerie_photo::join('activites', 'activites.id', '=', 'galerie_photos.galerie_id')
         ->count();
@@ -194,7 +203,7 @@ class PageController extends Controller
 
         $activite = Activite::where('slug', $get)->firstOrFail();
 
-        $baniere = Baniere::Where('id', 14)->first();
+        $baniere = Baniere::forPage('galerie-photo');
 
         $galerie = Galerie_photo::Where('galerie_id', $activite->id)
         ->paginate(9);
@@ -215,7 +224,7 @@ class PageController extends Controller
     {
 
         // code...
-        $baniere = Baniere::Where('id', 17)->first();
+        $baniere = Baniere::forPage('engagez');
         return view('pages.engagez')
         ->with('baniere', $baniere);
 
@@ -226,7 +235,7 @@ class PageController extends Controller
     public function projet()
 
     {
-        $baniere = Baniere::Where('id', 10)->first();
+        $baniere = Baniere::forPage('projets');
     	$projets = Projet::Where('ended', 'no')->orderBy('id', 'DESC')->paginate(9);
         $projet_termines = Projet::Where('ended', 'yes')->orderBy('id', 'DESC')->paginate(9);
 
@@ -242,7 +251,7 @@ class PageController extends Controller
     public function projetTermines()
 
     {
-        $baniere = Baniere::Where('id', 10)->first();
+        $baniere = Baniere::forPage('projets');
         $projets = Projet::Where('ended', 'yes')->orderBy('id', 'DESC')->paginate(9);
 
         return view('pages.projet_termines')
@@ -257,7 +266,7 @@ class PageController extends Controller
 
     public function projetDetail($slug)
     {
-        $baniere = Baniere::Where('id', 10)->first();
+        $baniere = Baniere::forPage('projets');
         $projet= Projet::where('slug', $slug)->firstOrFail();
     	$projets= Projet::orderBy('id', 'DESC')->paginate(5);
 
@@ -301,7 +310,7 @@ class PageController extends Controller
     {
 
 
-        $baniere = Baniere::Where('id', 16)->first();
+        $baniere = Baniere::forPage('blog');
         $blog = Blog::where('slug', $slug)
 
         ->firstOrFail();
@@ -322,7 +331,7 @@ class PageController extends Controller
 
     public function Blog()
     {
-      $baniere = Baniere::Where('id', 16)->first();
+      $baniere = Baniere::forPage('blog');
       $blog = Blog::latest()->paginate(6);
       return view('pages.blog')
       ->with('baniere', $baniere)
@@ -334,7 +343,7 @@ class PageController extends Controller
     public function main_activites()
     {
 
-      $baniere = Baniere::Where('id', 2)->first();
+      $baniere = Baniere::forPage('activites');
       $activites = Categorie_activitie::orderBy('id', 'ASC')->get();
       return view('pages.main-activity')
       ->with('baniere', $baniere)
@@ -344,20 +353,24 @@ class PageController extends Controller
 
     public function rapport_annuel()
     {
-        return view('pages.rapport_annuel');
+        return view('pages.rapport_annuel')
+        ->with('pubs', Publication::where('type', 'rapport-annuel')->orderBy('date_pub', 'DESC')->get());
     }
     public function rapport_projet()
     {
-        return view('pages.rapport_projet');
+        return view('pages.rapport_projet')
+        ->with('pubs', Publication::where('type', 'rapport-projet')->orderBy('date_pub', 'DESC')->get());
     }
     public function communique()
     {
-        return view('pages.communique');
+        return view('pages.communique')
+        ->with('pubs', Publication::where('type', 'communique')->orderBy('date_pub', 'DESC')->get());
     }
 
     public function article_presse()
     {
-        return view('pages.article_presse');
+        return view('pages.article_presse')
+        ->with('pubs', Publication::where('type', 'article-presse')->orderBy('date_pub', 'DESC')->get());
     }
 
 
@@ -370,7 +383,7 @@ class PageController extends Controller
       $activites = Activite::Where('categorie_activity_slug', $slug)->orderBy('id', 'DESC')->paginate(6);
 
       $cat = Categorie_activitie::Where('slug', $slug)->first();
-      $baniere = Baniere::Where('id', 2)->first();
+      $baniere = Baniere::forPage('activites');
 
       return view('pages.activites')
       ->with('title', $title)
@@ -386,7 +399,7 @@ class PageController extends Controller
     public function SingleActivite($slug_cat, $slug)
     {
 
-        $baniere = Baniere::Where('id', 2)->first();
+        $baniere = Baniere::forPage('activites');
         $activite = Activite::where('slug', $slug)
             ->firstOrFail();
 
@@ -409,7 +422,7 @@ class PageController extends Controller
     {
 
         # code...
-        $baniere = Baniere::Where('id', 6)->first();
+        $baniere = Baniere::forPage('contact');
         $setting = Setting::first();
         $captcha_image = $this->createCaptchaImage();
 
@@ -489,7 +502,7 @@ class PageController extends Controller
     public function publication()
     {
         // code...
-        $baniere = Baniere::Where('id', 6)->first();
+        $baniere = Baniere::forPage('publication');
         $pubs = Publication::orderBy('date_pub', 'DESC')->get();
 
         return view('pages.publication')
@@ -501,7 +514,7 @@ class PageController extends Controller
 
     public function team()
     {
-        $baniere = Baniere::Where('id', 4)->first();
+        $baniere = Baniere::forPage('equipe');
 
         $team_personnel = Team::Where('type_membre', 'Personnel')->orderBy('id', 'ASC')->get();
         $team_conseil_ad = Team::Where('type_membre', 'Conseil d\'administration')->orderBy('ordre', 'ASC')->get();
@@ -577,7 +590,7 @@ class PageController extends Controller
     {
 
         $title = "Qui sommes-nous";
-        $baniere = Baniere::Where('id', 5)->first();
+        $baniere = Baniere::forPage('about');
 
         return view('pages.about')
         ->with('baniere', $baniere);
@@ -586,7 +599,7 @@ class PageController extends Controller
 
     public function temoignage()
     {
-        $baniere = Baniere::Where('id', 5)->first();
+        $baniere = Baniere::forPage('temoignage');
 
         $temoignages = Temoignage::latest()->get();
         return view('pages.temoignage')
@@ -625,7 +638,8 @@ class PageController extends Controller
 
     {
 
-        return view('pages.carrers');
+        return view('pages.carrers')
+        ->with('pubs', Publication::where('type', 'emploi')->orderBy('date_pub', 'DESC')->get());
 
     }
 

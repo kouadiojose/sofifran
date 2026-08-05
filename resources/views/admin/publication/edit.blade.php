@@ -151,10 +151,28 @@
 
                             <div class="form-group">
 
+                                <label>Type de publication *</label>
+
+                                <select class="form-control" name="type" required>
+                                    @foreach(\App\Models\Publication::TYPES as $value => $label)
+                                        <option value="{{ $value }}" {{ $pub->type == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                                <small class="text-muted">Détermine sur quelle page du site le document sera affiché.</small>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+
                                 <label>Joindre un nouveau fichier (pdf)</label>
-                                <input type="file" name="file_name" accept=".pdf" class="form-control">
+                                <input type="file" name="file_name" accept=".pdf,.doc,.docx" class="form-control">
                                 <input type="hidden" value="{{ $pub->doc }}" name="file_name_up">
                                 <input type="hidden" value="{{ $pub->id }}" name="pub_id">
+                                <small class="text-muted">Laisser vide pour conserver le fichier actuel. <a href="{{ $pub->doc_url }}" target="_blank">Voir le fichier actuel</a></small>
                             </div>
 
                         </div>

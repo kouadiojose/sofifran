@@ -180,7 +180,95 @@
 
         <!-- /.row -->
 
-       
+        <div class="row">
+
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+              <span class="info-box-icon bg-primary elevation-1"><i class="far fa-envelope"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Messages de contact</span>
+                <span class="info-box-number">{{ $countContacts }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+              <span class="info-box-icon bg-success elevation-1"><i class="fas fa-at"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Abonnés infolettre</span>
+                <span class="info-box-number">{{ $countInfolettre }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+              <span class="info-box-icon bg-secondary elevation-1"><i class="far fa-comments"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Témoignages</span>
+                <span class="info-box-number">{{ $countTemoignages }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+              <span class="info-box-icon bg-info elevation-1"><i class="fas fa-calendar-alt"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Évènements à venir</span>
+                <span class="info-box-number">{{ $countEvenements }}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /.row -->
+
+        <div class="row">
+
+          <div class="col-md-12">
+            <div class="card card-primary card-outline">
+              <div class="card-header">
+                <h3 class="card-title"><i class="far fa-envelope"></i> Derniers messages de contact</h3>
+                <div class="card-tools">
+                  <a href="{{ route('admin-list-contacts') }}" class="btn btn-sm btn-primary">Voir tous les messages</a>
+                </div>
+              </div>
+              <div class="card-body p-0">
+                @if($derniersContacts->isNotEmpty())
+                <table class="table table-striped mb-0">
+                  <thead>
+                    <tr>
+                      <th>Nom</th>
+                      <th>Email</th>
+                      <th>Téléphone</th>
+                      <th>Message</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach($derniersContacts as $c)
+                    <tr>
+                      <td>{{ $c->name }}</td>
+                      <td><a href="mailto:{{ $c->email }}">{{ $c->email }}</a></td>
+                      <td>{{ $c->phone }}</td>
+                      <td>{{ \Illuminate\Support\Str::limit($c->message, 60) }}</td>
+                      <td>{{ $c->created_at ? $c->created_at->format('d/m/Y H:i') : '-' }}</td>
+                    </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+                @else
+                <p class="p-3 mb-0">Aucun message de contact pour le moment.</p>
+                @endif
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /.row -->
+
         <div class="row">
 
           <div class="col-md-12">
@@ -210,9 +298,16 @@
                       </a>
                     </div>
                     <div class="col-md-3 mb-3">
-                      <a style="width: 100%; height: 100%; font-size: 17px;" href="{{ route('admin-popups-create') }}" class="btn btn-app bg-warning">
+                      <a style="width: 100%; height: 100%; font-size: 17px;" href="{{ route('admin-publication-create') }}" class="btn btn-app bg-warning">
                           <i class="fas fa-file"></i>
                           Ajouter une nouvelle publication
+                      </a>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                      <a style="width: 100%; height: 100%; font-size: 17px;" href="{{ route('admin-popups-create') }}" class="btn btn-app bg-warning">
+                          <i class="far fa-window-restore"></i>
+                          Ajouter un popup d'annonce
                       </a>
                     </div>
 

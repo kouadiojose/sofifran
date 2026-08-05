@@ -45,9 +45,18 @@
                             </div>
 
                             <ul class="social">
-                                <li><a href="#"><i class="fi fi-brands-facebook"></i></a></li>
-                                <li><a href="#"><i class="fi fi-brands-linkedin"></i></a></li>
-                                <li><a href="#"><i class="fi fi-brands-instagram"></i></a></li>
+                                @if(!empty($setting?->facebook))
+                                <li><a href="{{ $setting->facebook }}" target="_blank"><i class="fi fi-brands-facebook"></i></a></li>
+                                @endif
+                                @if(!empty($setting?->linkedln))
+                                <li><a href="{{ $setting->linkedln }}" target="_blank"><i class="fi fi-brands-linkedin"></i></a></li>
+                                @endif
+                                @if(!empty($setting?->instagram))
+                                <li><a href="{{ $setting->instagram }}" target="_blank"><i class="fi fi-brands-instagram"></i></a></li>
+                                @endif
+                                @if(!empty($setting?->youtube))
+                                <li><a href="{{ $setting->youtube }}" target="_blank"><i class="fi fi-brands-youtube"></i></a></li>
+                                @endif
                             </ul>
                         </div>
                     </div>
@@ -75,11 +84,17 @@
                         <div class="single-footer-widget">
                             <h3>{{ app()->getLocale() == 'fr' ? 'Contact Info': 'Contact Info' }}</h3>
 
+                            @php
+                                $footerAddress = $setting->adresse1 ?? '8-165 Plymouth Rd, Welland, ON, L3B 3E1';
+                                $footerEmail   = $setting->email ?? 'info@sofifran.org';
+                                $footerPhone   = $setting->phone1 ?? '+1 (905) 714-7333';
+                                $footerFax     = $setting->phone2 ?? '+1 (905)-226-5282';
+                            @endphp
                             <ul class="footer-contact-info">
-                                <li><span>{{ app()->getLocale() == 'fr' ? 'Adresse': 'Location' }}:</span> 8-165 Plymouth Rd, Welland, ON, L3B 3E1</li>
-                                <li><span>Email:</span> <a href="mailto:info@sofifran.org"><span class="__cf_email__" data-cfemail="9feffafeedf0dff8f2fef6f3b1fcf0f2">info@sofifran.org</span></a></li>
-                                <li><span>{{ app()->getLocale() == 'fr' ? 'Téléphone': 'Phone' }}:</span> <a href="tel:+1(905)714-7333">+1 (905) 714-7333</a></li>
-                                <li><span>Fax:</span> <a href="tel:+1(905)-226-5282">+1 (905)-226-5282</a></li>
+                                <li><span>{{ app()->getLocale() == 'fr' ? 'Adresse': 'Location' }}:</span> {{ $footerAddress }}</li>
+                                <li><span>Email:</span> <a href="mailto:{{ $footerEmail }}">{{ $footerEmail }}</a></li>
+                                <li><span>{{ app()->getLocale() == 'fr' ? 'Téléphone': 'Phone' }}:</span> <a href="tel:{{ preg_replace('/[^0-9+]/', '', $footerPhone) }}">{{ $footerPhone }}</a></li>
+                                <li><span>Fax:</span> <a href="tel:{{ preg_replace('/[^0-9+]/', '', $footerFax) }}">{{ $footerFax }}</a></li>
                             </ul>
                         </div>
                     </div>
@@ -88,7 +103,7 @@
                 <div class="copyright-area">
                     <div class="row align-items-center">
                         <div class="col-lg-6 col-sm-6 col-md-6">
-                            <p>@ <script data-cfasync="false" src="#"></script><script>document.write(new Date().getFullYear())</script> Sofifran. {{ app()->getLocale() == 'fr' ? 'Tout Droit reservé par': 'All rights reserved by' }} <a href="https://markel-tech.com/" target="_blank">Markel Technology</a></p>
+                            <p>© {{ date('Y') }} Sofifran. {{ app()->getLocale() == 'fr' ? 'Tout Droit reservé par': 'All rights reserved by' }} <a href="https://markel-tech.com/" target="_blank">Markel Technology</a></p>
                         </div>
 
                         <div class="col-lg-6 col-sm-6 col-md-6">
