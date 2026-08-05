@@ -163,7 +163,10 @@ Route::get('/lang/{locale}', [
     'lang'
 ])->name('lang');
 
-Route::get('/captcha', [PageController::class, 'generate'])->name('captcha.generate');
+Route::post('/infolettre/subscribe', [
+    PageController::class,
+    'ValidInfolettre'
+])->name('infolettre-subscribe');
 
 /**END ROUTE FRONTEND */
 

@@ -12,6 +12,9 @@
 
   }
 
+  $mois_noms = app()->getLocale() == 'fr'
+    ? [1 => 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    : [1 => 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
   $UneLink = "https://sofifran.org/publication/infolettre";
 ?>
@@ -505,7 +508,7 @@
 
                                         <span>{{ $date->format('d') }}</span>
 
-                                        <h3>{{ strftime('%B %Y', $date->getTimestamp()) }}</h3>
+                                        <h3>{{ $mois_noms[(int) $date->format('n')] }} {{ $date->format('Y') }}</h3>
 
                                         <p>{{ $heure->format('H') }}H</p>
 
