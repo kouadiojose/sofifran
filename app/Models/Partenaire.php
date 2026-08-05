@@ -1,0 +1,1 @@
+<?phpnamespace App\Models;use Illuminate\Database\Eloquent\Model;class Partenaire extends Model{    protected $fillable = [    	'image', 'link', 'name', 'type', 'orders'    ];}
