@@ -129,6 +129,7 @@
                           <thead>
 
                               <th>N°</th>
+                              <th>Type</th>
 
                               <th>Fichier</th>
                               <th>Titre en francais</th>
@@ -156,7 +157,8 @@
                             <tr>
 
                               <td>{{ $i++ }}</td>
-                              <td>{{ $p->doc }}</td>
+                              <td><span class="badge badge-info">{{ $p->type_label }}</span></td>
+                              <td><a href="{{ $p->doc_url }}" target="_blank">{{ \Illuminate\Support\Str::limit(basename($p->doc), 40) }}</a></td>
                               <td>{{ $p->titre_fr }}</td>
                               <td>{{ $p->titre_en }}</td>
                               <td>{{ date('d m Y', strtotime($p->date_pub)) }}</td>

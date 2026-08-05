@@ -113,8 +113,9 @@
 
 
 
-<!-- Popup Annonce -->
+<!-- Popup Annonce (popup actif selon ses dates de debut/fin, gere dans l'admin) -->
 
+@if($popup)
 
 <div id="ad-overlay" class="ad-overlay" hidden></div>
 
@@ -151,6 +152,7 @@
   </div>
 </div>
 
+@endif
 
 <!-- Start Main Banner Area -->
 

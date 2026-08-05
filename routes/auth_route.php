@@ -148,6 +148,14 @@ Route::prefix('admin-sofifran')->group(function () {
         Route::post('/activites/delete', [AdminController::class, 'DelActivite'])->name('admin-activite-delete');
         Route::post('/sous-activites/delete', [AdminController::class, 'DelSousActivite'])->name('admin-sous-activite-delete');
 
+        /*** Categories d'activites ***/
+        Route::get('/categories', [AdminController::class, 'categories'])->name('admin-categorie');
+        Route::get('/categories/create', [AdminController::class, 'categorieCreate'])->name('admin-categorie-create');
+        Route::post('/categories/create/valid', [AdminController::class, 'categorieCreateValid'])->name('admin-categorie-create-valid');
+        Route::get('/categories/edit/{id}', [AdminController::class, 'categorieEdit'])->name('admin-categorie-edit');
+        Route::post('/categories/edit/valid', [AdminController::class, 'categorieEditValid'])->name('admin-categorie-edit-valid');
+        Route::post('/categories/delete', [AdminController::class, 'categorieDel'])->name('admin-categorie-delete');
+
         /*** Sondage ***/
         Route::get('/sondage', [AdminController::class, 'sondage'])->name('admin-sondage');
         Route::post('/sondage/valide', [AdminController::class, 'SondageValide'])->name('admin-sondage-valide');

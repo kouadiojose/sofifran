@@ -144,16 +144,28 @@
             <div class="sidebar-contact-info">
                 <div class="contact-info-content">
                     <h2>
-                        <a href="tel:+1(905)714-7333">+1 (905) 714-7333</a>
+                        @php $headerPhone = $setting->phone1 ?? '+1 (905) 714-7333'; @endphp
+                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $headerPhone) }}">{{ $headerPhone }}</a>
                         <span>OR</span>
-                        <a href="/cdn-cgi/l/email-protection#09796c687b66496e64686065276a6664"><span class="__cf_email__" data-cfemail="e69683879489a6818b878f8ac885898b">info@sofifran.org</span></a>
+                        <a href="mailto:{{ $setting->email ?? 'info@sofifran.org' }}">{{ $setting->email ?? 'info@sofifran.org' }}</a>
                     </h2>
 
                     <ul class="social">
-                        <li><a href="#" target="_blank"><i class="fab fa-youtube"></i></a></li>
-                        <li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
-                        <li><a href="#" target="_blank"><i class="fab fa-linkedin-in"></i></a></li>
-                        <li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
+                        @if(!empty($setting?->youtube))
+                        <li><a href="{{ $setting->youtube }}" target="_blank"><i class="fab fa-youtube"></i></a></li>
+                        @endif
+                        @if(!empty($setting?->facebook))
+                        <li><a href="{{ $setting->facebook }}" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+                        @endif
+                        @if(!empty($setting?->linkedln))
+                        <li><a href="{{ $setting->linkedln }}" target="_blank"><i class="fab fa-linkedin-in"></i></a></li>
+                        @endif
+                        @if(!empty($setting?->instagram))
+                        <li><a href="{{ $setting->instagram }}" target="_blank"><i class="fab fa-instagram"></i></a></li>
+                        @endif
+                        @if(!empty($setting?->twitter))
+                        <li><a href="{{ $setting->twitter }}" target="_blank"><i class="fab fa-twitter"></i></a></li>
+                        @endif
                     </ul>
                 </div>
             </div>

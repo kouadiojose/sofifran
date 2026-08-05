@@ -146,13 +146,30 @@
                             </div>
 
                         </div>
-                          
+
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+
+                                <label>Type de publication *</label>
+
+                                <select class="form-control" name="type" required>
+                                    @foreach(\App\Models\Publication::TYPES as $value => $label)
+                                        <option value="{{ $value }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                                <small class="text-muted">Détermine sur quelle page du site le document sera affiché.</small>
+
+                            </div>
+
+                        </div>
+
                         <div class="col-md-6">
 
                             <div class="form-group">
 
                                 <label>Joindre le fichier (pdf) *</label>
-                                <input type="file" name="file_name" accept=".pdf" class="form-control" required>
+                                <input type="file" name="file_name" accept=".pdf,.doc,.docx" class="form-control" required>
 
                             </div>
 
