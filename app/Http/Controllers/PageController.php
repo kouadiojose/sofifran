@@ -1,41 +1,25 @@
 <?php
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use App\Models\Vision;
 use App\Models\Popup;
 use App\Models\Projet;
-use App\Models\Partenaire;
 use App\Models\Atelier;
 use App\Models\Temoignage;
 use App\Models\Publication;
 use App\Models\Infolettre;
-use App\Models\Slider;
 use App\Models\Blog;
-use App\Models\Bloc;
-use App\Models\Galerie;
 use App\Models\Galerie_photo;
 use App\Models\Galerie_video;
-
-use App\Models\Sondage;
-
 use App\Models\Setting;
-
 use App\Models\Team;
-
 use App\Models\Inscription;
 use App\Models\Baniere;
-
 use App\Models\Activite;
 use App\Models\Categorie_activitie;
 use App\Models\Contact;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Intervention\Image\Laravel\Facades\Image;
-
-use Calendar;
-use Session;
-use Str;
+use Illuminate\Support\Facades\Session;
 
 
 
@@ -50,18 +34,14 @@ class PageController extends Controller
 
     public function index()
     {
-
-        //dd(bcrypt('12345678'));
-
+        // Seules les donnees reellement affichees par pages/index.blade.php
+        // sont chargees ici (l'ancienne version executait ~10 requetes inutilisees).
         $popup = Popup::where('id', 1)->first();
 
-        $projets = Projet::Where('ended', 'no')->orderBy('id', 'DESC')->paginate(4);
+        $projets = Projet::where('ended', 'no')->orderBy('id', 'DESC')->paginate(4);
 
-    	$blogs = Blog::orderBy('id', 'DESC')->paginate(6);
-    	$blogs2 = Blog::orderBy('id', 'ASC')->paginate(8);
+        $blogs = Blog::orderBy('id', 'DESC')->paginate(6);
 
-
-        //$atelier = Atelier::where('end', '>=', now())->orderBy('start', 'ASC')->get();
         $atelier = Atelier::whereRaw(
             "TIMESTAMP(`end`, `hour_end`) >= ?",
             [now()->format('Y-m-d H:i:s')]
@@ -69,57 +49,20 @@ class PageController extends Controller
         ->orderByRaw("TIMESTAMP(`start`, `hour_start`) ASC")
         ->get();
 
-        //dd($atelier);
-
-        $slide = Slider::orderBy('id', 'DESC')->get();
-
-        $bloc = Bloc::all();
-        $sondage = Bloc::first();
-        $galerie = Galerie::latest()->paginate(4);
-
-        $last_activites = Activite::orderBy('id', 'DESC')->paginate(4);
-
-        $last_projet = Projet::latest()->paginate(4);
-
-
-        $header = DB::table('entete_activites')->first();
         $temoignages = Temoignage::orderBy('id', 'DESC')->get();
 
         $partenaires = DB::table('partenaires')->orderBy('orders', 'asc')->get();
 
-        $pubs = Publication::orderBy('date_pub', 'DESC')->paginate(2);
-        $videos = Galerie_video::latest()->get();
-
         $activites = Categorie_activitie::orderBy('id', 'ASC')->get();
 
-        //dd($activites);
         return view('pages.index')
         ->with('atelier', $atelier)
-        ->with('videos', $videos)
         ->with('activites', $activites)
         ->with('popup', $popup)
-        ->with('pubs', $pubs)
-        ->with('last_projet', $last_projet)
-
-        ->with('slide', $slide)
         ->with('temoignages', $temoignages)
-
         ->with('blogs', $blogs)
-        ->with('blogs2', $blogs2)
         ->with('partenaires', $partenaires)
-
-        ->with('sondage', $sondage)
-
-        ->with('bloc', $bloc)
-
-        ->with('galerie', $galerie)
-
-        ->with('last_activites', $last_activites)
-
-        ->with('header', $header)
-
         ->with('projets', $projets);
-
     }
 
 
@@ -181,7 +124,7 @@ class PageController extends Controller
     {
         $baniere = Baniere::Where('id', 9)->first();
         $atelier = Atelier::Where('slug', $slug)
-        ->first();
+        ->firstOrFail();
         $ateliers = Atelier::where('start', '>=', now())->orderBy('start', 'ASC')->get();        
         return view('pages.detail_atelier')
         ->with('baniere', $baniere)
@@ -249,7 +192,7 @@ class PageController extends Controller
 
     {
 
-        $activite = Activite::where('slug', $get)->first();
+        $activite = Activite::where('slug', $get)->firstOrFail();
 
         $baniere = Baniere::Where('id', 14)->first();
 
@@ -315,7 +258,7 @@ class PageController extends Controller
     public function projetDetail($slug)
     {
         $baniere = Baniere::Where('id', 10)->first();
-        $projet= Projet::where('slug', $slug)->first();
+        $projet= Projet::where('slug', $slug)->firstOrFail();
     	$projets= Projet::orderBy('id', 'DESC')->paginate(5);
 
         return view('pages.projet_detail')
@@ -328,33 +271,26 @@ class PageController extends Controller
 
 
     public function ValidInfolettre(Request $request)
-
     {
+        $request->validate([
+            'email' => ['required', 'email:filter', 'max:150'],
+        ]);
 
-        $email = Infolettre::Where('email', strtolower($request->email))->first();
+        $email = strtolower($request->email);
 
+        if (Infolettre::where('email', $email)->exists()) {
+            session()->flash('newsletter_error', app()->getLocale() == 'fr'
+                ? 'Cette adresse email est déjà inscrite!'
+                : 'This email address is already subscribed!');
+        } else {
+            Infolettre::create(['email' => $email]);
 
-
-        if ( $email ) {
-
-          return response()->json(['code'=>500, 'error'=>'Cette adresse email existe déjà!']);
-
-        }else{
-
-          $post = Infolettre::create([
-
-            'email' => strtolower($request->email)
-
-          ]);
-
-          return response()->json([ 'code'=>200, 'succes'=>'Votre email a été bien enregistré avec succès!', 'data'=>$post ]);
-
+            session()->flash('newsletter_success', app()->getLocale() == 'fr'
+                ? 'Votre email a bien été enregistré. Merci!'
+                : 'Your email has been successfully registered. Thank you!');
         }
 
-
-
-        return response()->json();
-
+        return back();
     }
 
 
@@ -368,7 +304,7 @@ class PageController extends Controller
         $baniere = Baniere::Where('id', 16)->first();
         $blog = Blog::where('slug', $slug)
 
-        ->first();
+        ->firstOrFail();
 
         $blogs = Blog::latest()->paginate(4);
 
@@ -452,7 +388,7 @@ class PageController extends Controller
 
         $baniere = Baniere::Where('id', 2)->first();
         $activite = Activite::where('slug', $slug)
-            ->first();
+            ->firstOrFail();
 
         $galerie = Galerie_photo::Where('galerie_id', $activite->id)->get();
 
@@ -487,24 +423,35 @@ class PageController extends Controller
     public function contactSendMail(Request $request)
     {
 
+        $request->validate([
+            'form_name'    => ['required', 'string', 'max:150'],
+            'form_phone'   => ['nullable', 'string', 'max:30'],
+            'email'        => ['required', 'email:filter', 'max:150'],
+            'form_message' => ['required', 'string', 'max:5000'],
+            'captcha'      => ['required', 'string'],
+        ]);
+
         // Vérifier si le délai minimum est respecté
         if (Session::has('captcha_time') && (time() - Session::get('captcha_time') < 10)) {
             session()->flash('message_error', 'Veuillez attendre 10 secondes avant de réessayer.');
-            return back();
+            return back()->withInput();
         }
 
-        if ($request->input('captcha') !== Session::get('captcha')) {
+        if (strtoupper(trim($request->input('captcha'))) !== Session::get('captcha')) {
             $attempts = Session::get('captcha_attempts', 0) + 1;
             Session::put('captcha_attempts', $attempts);
 
             if ($attempts >= 3) {
                 session()->flash('message_error', 'Vous avez dépassé le nombre maximum de tentatives. Veuillez réessayer plus tard.');
-                return back();
+                return back()->withInput();
             } else {
-                session()->flash('message_error', 'CAPTCHA incorrect. Tentative'. $attempts.' sur 3.');
-                return back();
+                session()->flash('message_error', 'CAPTCHA incorrect. Tentative '. $attempts.' sur 3.');
+                return back()->withInput();
             }
         }
+
+        // Le captcha utilisé ne doit pas pouvoir être rejoué.
+        Session::forget('captcha');
 
         Session::put('captcha_attempts', 0);
 
@@ -533,7 +480,7 @@ class PageController extends Controller
               $message->replyTo( $this->reply_to );
           });
 
-        $request->session()->put('msg_success', 'Nous avons bien recu votre message et nous vous repondons dans un bref delai. Merci!');
+        $request->session()->flash('msg_success', 'Nous avons bien recu votre message et nous vous repondons dans un bref delai. Merci!');
         
 
         return back();
@@ -616,11 +563,9 @@ class PageController extends Controller
 
             ]);
 
+            $request->session()->flash('msg_success', 'Vous avez ajouté vos informations avec succès!');
+
         }
-
-        $request->session()->put('msg_success', 'Vous avez ajouté vos informations avec succès!');
-
-        //dd('Bon');
 
         return back();
 

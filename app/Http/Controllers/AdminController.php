@@ -34,7 +34,6 @@ use App\Models\Sous_activite;
 use App\Models\Team;
 use App\Models\Temoignage;
 use App\Models\User;
-use Calendar;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
@@ -43,19 +42,19 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
-use phpDocumentor\Reflection\Types\Integer;
 
 class AdminController extends Controller
 {
-    public function __construct()
-    {
-        // $this->middleware('auth:admin');
-    }
-
 	private function uploadImage(UploadedFile $file, string $relativePath, ?int $width, ?int $height): string
 	{
 	    $image = Image::read($file);
-	    $ext   = $file->getClientOriginalExtension();
+
+	    // Seules les extensions d'images connues sont conservees : tout autre
+	    // fichier est re-encode en .jpg pour empecher le depot d'un script dans /public.
+	    $ext = strtolower($file->getClientOriginalExtension());
+	    if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+	        $ext = 'jpg';
+	    }
 	    $name  = time() . '_' . uniqid() . '.' . $ext;
 
 	    $destinationPath = public_path(rtrim($relativePath, '/') . '/');
@@ -393,7 +392,7 @@ class AdminController extends Controller
 
     public function DelPartenaire(Request $request)
     {
-        DB::table('partenaires')->findOrFail($request->del_id)->delete();
+        DB::table('partenaires')->where('id', $request->del_id)->delete();
         $request->session()->flash('msg', 'Vous avez supprimé le partenaire avec succès!');
         return back();
     }
@@ -521,22 +520,40 @@ class AdminController extends Controller
 
     public function ComposeMail(Request $request)
     {
-        $emails = json_encode($request->mailgroupe);
-        $emails = str_replace(['["', '"]', '"'], '', $emails);
+        // Liste d'adresses valides uniquement (le champ peut arriver
+        // sous forme de tableau ou de chaine "a@b.com,c@d.com").
+        $emails = is_array($request->mailgroupe)
+            ? $request->mailgroupe
+            : explode(',', (string) $request->mailgroupe);
 
+        $emails = array_values(array_filter(array_map('trim', $emails), function ($email) {
+            return filter_var($email, FILTER_VALIDATE_EMAIL);
+        }));
+
+        if (empty($emails)) {
+            $request->session()->flash('msg_error', 'Aucune adresse email valide sélectionnée!');
+            return back();
+        }
+
+        $attachmentPath = null;
         if ($request->hasFile('attachment')) {
             $ext  = $request->attachment->getClientOriginalExtension();
             $file = time() . '_' . uniqid() . '.' . $ext;
             $request->attachment->move(public_path('/frontend/assets/file_upload_compose/'), $file);
+            $attachmentPath = public_path('/frontend/assets/file_upload_compose/') . $file;
         }
 
-        \Mail::send('admin.infolettre.html_send_content', [
+        Mail::send('admin.infolettre.html_send_content', [
             'sujet'    => $request->sujet,
             'contenu'  => $request->contenu,
-        ], function ($message) use ($emails) {
-            $message->to('info@pointancragejeunesse.org')
+        ], function ($message) use ($emails, $request, $attachmentPath) {
+            $message->to('info@sofifran.org')
                     ->bcc($emails)
-                    ->subject('Infolettre');
+                    ->subject($request->sujet ?: 'Infolettre');
+
+            if ($attachmentPath) {
+                $message->attach($attachmentPath);
+            }
         });
 
         $request->session()->flash('msg', 'Vous avez envoyé un email avec succès!');
@@ -1364,11 +1381,11 @@ class AdminController extends Controller
 
     public function ChangePassword(Request $request)
     {
-        $admin = Admin::where('id', Auth::user()->id)->first();
+        $admin = Auth::guard('admin')->user();
 
         if (Hash::check($request->old_password, $admin->password)) {
             if ($request->new_password === $request->conf_password) {
-                Admin::where('id', Auth::user()->id)->update([
+                Admin::where('id', $admin->id)->update([
                     'password' => bcrypt($request->new_password),
                 ]);
                 $request->session()->flash('msg', 'Mot de passe changé avec succès!');

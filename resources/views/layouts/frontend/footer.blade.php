@@ -13,11 +13,22 @@
 
                         <div class="col-lg-7 col-md-12">
                             <div class="subscribe-form">
-                                <form class="newsletter-form" data-toggle="validator">
+                                <form class="newsletter-form" action="{{ route('infolettre-subscribe') }}" method="POST">
+                                    @csrf
                                     <input type="email" class="input-newsletter" placeholder="{{ app()->getLocale() == 'fr' ? 'Votre Email': 'Your Email Adress' }}..." name="email" required autocomplete="off">
-    
+
                                     <button type="submit">{{ app()->getLocale() == 'fr' ? 'Souscrire': 'Subscribe' }} <i class="flaticon-right-chevron"></i></button>
-                                    <div id="validator-newsletter" class="form-result"></div>
+                                    <div id="validator-newsletter" class="form-result">
+                                        @if(session('newsletter_success'))
+                                            <span style="color:#8bc34a;">{{ session('newsletter_success') }}</span>
+                                        @endif
+                                        @if(session('newsletter_error'))
+                                            <span style="color:#ff5252;">{{ session('newsletter_error') }}</span>
+                                        @endif
+                                        @error('email')
+                                            <span style="color:#ff5252;">{{ $message }}</span>
+                                        @enderror
+                                    </div>
                                 </form>
                             </div>
                         </div>
