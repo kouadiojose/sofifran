@@ -16,6 +16,22 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             Localization::class
         ]);
+
+        // Les invités de la zone admin sont renvoyés vers le login admin,
+        // les autres vers le login classique (Breeze).
+        $middleware->redirectGuestsTo(function ($request) {
+            return $request->is('admin-sofifran*')
+                ? route('admin-login')
+                : route('login');
+        });
+
+        // Un utilisateur deja connecte qui revient sur une page de login
+        // est renvoye vers son tableau de bord.
+        $middleware->redirectUsersTo(function ($request) {
+            return $request->is('admin-sofifran*')
+                ? route('admin-dashboard')
+                : route('dashboard');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

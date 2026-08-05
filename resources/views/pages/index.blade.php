@@ -12,6 +12,9 @@
 
   }
 
+  $mois_noms = app()->getLocale() == 'fr'
+    ? [1 => 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    : [1 => 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
   $UneLink = "https://sofifran.org/publication/infolettre";
 ?>
@@ -110,8 +113,9 @@
 
 
 
-<!-- Popup Annonce -->
+<!-- Popup Annonce (popup actif selon ses dates de debut/fin, gere dans l'admin) -->
 
+@if($popup)
 
 <div id="ad-overlay" class="ad-overlay" hidden></div>
 
@@ -148,6 +152,7 @@
   </div>
 </div>
 
+@endif
 
 <!-- Start Main Banner Area -->
 
@@ -505,7 +510,7 @@
 
                                         <span>{{ $date->format('d') }}</span>
 
-                                        <h3>{{ strftime('%B %Y', $date->getTimestamp()) }}</h3>
+                                        <h3>{{ $mois_noms[(int) $date->format('n')] }} {{ $date->format('Y') }}</h3>
 
                                         <p>{{ $heure->format('H') }}H</p>
 

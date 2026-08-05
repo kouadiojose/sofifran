@@ -177,11 +177,15 @@
 
                     <h2>
 
-                        <a href="tel:+1 (905) 226 5282">+1 (905) 226 5282</a>
+                        @php
+                            $contactPhone = $setting->phone1 ?? '+1 (905) 226 5282';
+                            $contactEmail = $setting->email ?? 'info@sofifran.org';
+                        @endphp
+                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $contactPhone) }}">{{ $contactPhone }}</a>
 
                         <span>OU</span>
 
-                        <a href="mailto:info@sofifran.org"><span class="__cf_email__" data-cfemail="dfafbabeadb09fb8b2beb6b3f1bcb0b2">info@sofifran.org</span></a>
+                        <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a>
 
                     </h2>
 
@@ -189,9 +193,9 @@
 
                     <ul class="social">
 
-                        <li><a href="#" target="_blank"><i class="fi fi-brands-facebook"></i></a></li>
+                        <li><a href="{{ $setting->facebook ?? '#' }}" target="_blank"><i class="fi fi-brands-facebook"></i></a></li>
 
-                        <li><a href="#" target="_blank"><i class="fi fi-brands-linkedin"></i></a></li>
+                        <li><a href="{{ $setting->linkedln ?? '#' }}" target="_blank"><i class="fi fi-brands-linkedin"></i></a></li>
 
                         <li><a href="#" target="_blank"><i class="fi fi-brands-instagram"></i></a></li>
 

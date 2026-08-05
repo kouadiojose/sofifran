@@ -39,7 +39,7 @@
                         <div class="date mt-4"><i class="flaticon-calendar"></i><span>{{ date('d M Y', strtotime($p->date_pub)) }}</span></div>
                         <h2>{{ app()->getLocale() == 'fr' ? $p->titre_fr: $p->titre_en }}</h2>
 
-                        <a target="_blank" class="default-btn" href="/frontend/assets/images/publication/{{ $p->doc }}">{{ app()->getLocale() == 'fr' ? 'Voir la Publication': 'See Publication' }}</a>
+                        <a target="_blank" class="default-btn" href="{{ $p->doc_url }}">{{ app()->getLocale() == 'fr' ? 'Voir la Publication': 'See Publication' }}</a>
                       </div>
                   </div>
                 @endforeach
