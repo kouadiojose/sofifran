@@ -476,7 +476,7 @@
 
                         <div class="events-image">
 
-                            <div class="image" style="background: url('/frontend/assets/images/ateliers/{{ $a->image }}');">
+                            <div class="image" style="background: {{ $a->image ? "url('/frontend/assets/images/ateliers/" . $a->image . "')" : ($a->color ?: '#6f2da8') }};">
 
                             </div>
 
@@ -492,7 +492,7 @@
 
                                 <p><?= app()->getLocale() == 'fr' ? substr($a->description_fr, 0, 100): substr($a->description_en, 0, 100);  ?>...</p>
 
-                                <span class="location"><i class="fi fi-br-calendar"></i> au {{ $date->format('d/m/Y') }}  </span>
+                                <span class="location"><i class="fi fi-br-calendar"></i> {{ $a->periode() }}</span>
 
                                 <a href="{{ route('detail-atelier', $a->slug) }}" class="join-now-btn">Détails</a>
 

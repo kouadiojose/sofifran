@@ -50,12 +50,9 @@ class PageController extends Controller
 
         $blogs = Blog::orderBy('id', 'DESC')->paginate(6);
 
-        $atelier = Atelier::whereRaw(
-            "TIMESTAMP(`end`, `hour_end`) >= ?",
-            [now()->format('Y-m-d H:i:s')]
-        )
-        ->orderByRaw("TIMESTAMP(`start`, `hour_start`) ASC")
-        ->get();
+        // Evenements a venir ou en cours (logique centralisee dans le modele,
+        // tolerante aux heures manquantes).
+        $atelier = Atelier::aVenir()->chrono()->get();
 
         $temoignages = Temoignage::orderBy('id', 'DESC')->get();
 
@@ -119,8 +116,10 @@ class PageController extends Controller
     {
         $baniere = Baniere::forPage('atelier');
 
-        //$data = Atelier::all();
-        $data = Atelier::where('start', '>=', now())->orderBy('start', 'ASC')->get();
+        // Inclut les evenements en cours (avant : start >= aujourd'hui,
+        // un evenement multi-jours deja commence disparaissait de la page).
+        $data = Atelier::aVenir()->chrono()->get();
+
         return view('pages.calendrier')
         ->with('baniere', $baniere)
         ->with('calendar', $data);
@@ -135,7 +134,7 @@ class PageController extends Controller
         $baniere = Baniere::forPage('atelier');
         $atelier = Atelier::Where('slug', $slug)
         ->firstOrFail();
-        $ateliers = Atelier::where('start', '>=', now())->orderBy('start', 'ASC')->get();        
+        $ateliers = Atelier::aVenir()->chrono()->take(5)->get();
         return view('pages.detail_atelier')
         ->with('baniere', $baniere)
         ->with('ateliers', $ateliers)
