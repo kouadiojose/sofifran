@@ -61,7 +61,9 @@ class AdminController extends Controller
 	        $image->resize($width, $height);
 	    }
 
-	    $image->save($destinationPath . $name);
+	    // Compression systematique des uploads (qualite 80) : evite que des
+	    // photos de plusieurs Mo sortent telles quelles sur le site.
+	    $image->save($destinationPath . $name, quality: 80);
 	    return $name;
 	}
 
@@ -688,6 +690,8 @@ class AdminController extends Controller
             'image'    => $name,
         ]);
 
+        Baniere::viderCache();
+
         $request->session()->flash('msg', 'Vous avez ajouté une banière!');
         return back();
     }
@@ -714,6 +718,8 @@ class AdminController extends Controller
             'image'    => $name,
         ]);
 
+        Baniere::viderCache();
+
         $request->session()->flash('msg', 'Vous avez modifié une banière!');
         return back();
     }
@@ -721,6 +727,8 @@ class AdminController extends Controller
     public function DelBaniere(Request $request)
     {
         Baniere::findOrFail($request->del_id)->delete();
+        Baniere::viderCache();
+
         $request->session()->flash('msg_baniere', 'Vous avez supprimé une baniere avec succès!');
         return back();
     }

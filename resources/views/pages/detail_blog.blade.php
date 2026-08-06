@@ -9,6 +9,9 @@
 
 @section('title', $langue)
 
+@section('meta_description', \Illuminate\Support\Str::limit(strip_tags(app()->getLocale() == 'fr' ? $blog->description_fr : $blog->description_en), 160))
+@section('meta_image', url('/frontend/assets/images/blog/' . $blog->image))
+
 @section('content')
    <!-- Start Page Title Area -->
     <div class="page-title-area page-title-bg3" @if(!empty($baniere) && $baniere->image) style="background-image: url('/frontend/assets/images/resource/{{ $baniere->image }}');" @endif>

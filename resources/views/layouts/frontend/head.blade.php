@@ -4,8 +4,29 @@
         <!-- Required meta tags -->
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="description" content="En mars 2006, sept femmes immigrées francophones vivant au Niagara, de toutes les origines et religions, ont rencontré pour identifier leurs besoins prioritaires. À la fin de plusieurs réunions, ils ont reconnu le besoin urgent de créer une plate-forme pour les représenter, les soutenir et organiser des activités sociales, culturelles, économiques et éducatives spécifiques à leur communauté. Sofifran (Solidarité des Femmes Immigrants Francophones du Niagara) a été créé le 11 décembre 2007. Sa mission visait exclusivement le développement social, économique, éducatif et culturel des femmes immigrées francophones résidant au Niagara. Le 5 décembre 2010, la mission et le mandat de Sofifran ont été étendus aux familles d'immigrants francophones à Niagara.
-      ">
+
+        @php
+          // Description : surchargeable par page via @section('meta_description'),
+          // sinon description par defaut (~160 caracteres pour les moteurs).
+          $defaultDescription = app()->getLocale() == 'fr'
+              ? "SOFIFRAN – Solidarité des Femmes et Familles Interconnectées Francophones du Niagara. Organisme communautaire d'accompagnement des familles immigrantes francophones."
+              : 'SOFIFRAN – Community organization supporting French-speaking immigrant women and families in the Niagara region since 2007.';
+          $metaImage = url('/frontend/assets/images/logo-white.png');
+        @endphp
+
+        <meta name="description" content="@hasSection('meta_description')@yield('meta_description')@else{{ $defaultDescription }}@endif">
+
+        {{-- Partage social (Open Graph / Twitter) --}}
+        <meta property="og:site_name" content="Sofifran">
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="Sofifran - @yield('title')">
+        <meta property="og:description" content="@hasSection('meta_description')@yield('meta_description')@else{{ $defaultDescription }}@endif">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:image" content="@hasSection('meta_image')@yield('meta_image')@else{{ $metaImage }}@endif">
+        <meta name="twitter:card" content="summary_large_image">
+
+        <link rel="canonical" href="{{ url()->current() }}">
+
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         <!-- All CSS Links -->
