@@ -64,6 +64,18 @@ class AdminController extends Controller
 	    // Compression systematique des uploads (qualite 80) : evite que des
 	    // photos de plusieurs Mo sortent telles quelles sur le site.
 	    $image->save($destinationPath . $name, quality: 80);
+
+	    // Variante .webp servie aux navigateurs modernes (voir public/.htaccess).
+	    try {
+	        $webp = $destinationPath . $name . '.webp';
+	        $image->toWebp(80)->save($webp);
+	        if (file_exists($webp) && filesize($webp) >= filesize($destinationPath . $name)) {
+	            @unlink($webp); // pas de gain : inutile de la garder
+	        }
+	    } catch (\Throwable $e) {
+	        // GD sans support webp sur l'hebergement : on sert simplement le jpeg/png
+	    }
+
 	    return $name;
 	}
 

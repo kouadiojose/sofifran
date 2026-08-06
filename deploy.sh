@@ -23,7 +23,10 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-echo "5/5 Lien storage (sans erreur s'il existe deja)..."
+echo "5/6 Variantes webp des images (servies aux navigateurs modernes)..."
+php artisan sofifran:webp || true
+
+echo "6/6 Lien storage (sans erreur s'il existe deja)..."
 php artisan storage:link 2>/dev/null || true
 
 echo ""
