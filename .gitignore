@@ -1,6 +1,6 @@
 /.phpunit.cache
 /node_modules
-/public/build
+# /public/build (commité : évite Node.js sur l’hébergement mutualisé)
 /public/hot
 /public/storage
 /storage/*.key
