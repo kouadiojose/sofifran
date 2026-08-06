@@ -12,7 +12,6 @@ use App\Models\Galerie_photo;
 use App\Models\Galerie_video;
 use App\Models\Setting;
 use App\Models\Team;
-use App\Models\Inscription;
 use App\Models\Baniere;
 use App\Models\Activite;
 use App\Models\Categorie_activitie;
@@ -46,9 +45,14 @@ class PageController extends Controller
             ->orderBy('id', 'DESC')
             ->first();
 
-        $projets = Projet::where('ended', 'no')->orderBy('id', 'DESC')->paginate(4);
+        $projets = Projet::where('ended', 'no')->orderBy('id', 'DESC')->take(4)->get();
 
-        $blogs = Blog::orderBy('id', 'DESC')->paginate(6);
+        $blogs = Blog::orderBy('id', 'DESC')->take(6)->get();
+
+        // Compteurs de la section chiffres cles (avant : codes en dur dans la vue)
+        $nbProjets     = Projet::count();
+        $nbPartenaires = DB::table('partenaires')->count();
+        $nbBlogs       = Blog::count();
 
         // Evenements a venir ou en cours (logique centralisee dans le modele,
         // tolerante aux heures manquantes).
@@ -67,18 +71,14 @@ class PageController extends Controller
         ->with('temoignages', $temoignages)
         ->with('blogs', $blogs)
         ->with('partenaires', $partenaires)
+        ->with('nbProjets', $nbProjets)
+        ->with('nbPartenaires', $nbPartenaires)
+        ->with('nbBlogs', $nbBlogs)
         ->with('projets', $projets);
     }
 
 
 
-    public function vision_mission()
-
-    {
-
-        return view('pages.vision_mission');
-
-    }
 
 
 
@@ -94,13 +94,6 @@ class PageController extends Controller
 
 
 
-    public function benevole()
-
-    {
-
-        return view('pages.benevole');
-
-    }
     
     public function infolettre()
     {
@@ -184,8 +177,7 @@ class PageController extends Controller
     {
         $baniere = Baniere::forPage('galerie-photo');
 
-        $galerie = Galerie_photo::join('activites', 'activites.id', '=', 'galerie_photos.galerie_id')
-        ->count();
+        $galerie = 0; // (l'ancien count global n'etait jamais affiche)
 
         //dd('ici');
         $activites = Activite::latest()->paginate(12);
@@ -207,8 +199,6 @@ class PageController extends Controller
 
         $galerie = Galerie_photo::Where('galerie_id', $activite->id)
         ->paginate(9);
-
-        $activites = Activite::latest()->paginate(9);
 
         return view('pages.get_galerie_photos')
         ->with('baniere', $baniere)
@@ -237,10 +227,8 @@ class PageController extends Controller
     {
         $baniere = Baniere::forPage('projets');
     	$projets = Projet::Where('ended', 'no')->orderBy('id', 'DESC')->paginate(9);
-        $projet_termines = Projet::Where('ended', 'yes')->orderBy('id', 'DESC')->paginate(9);
 
         return view('pages.projets')
-        ->with('projet_termines', $projet_termines)
         ->with('baniere', $baniere)
         ->with('projets', $projets);
 
@@ -442,6 +430,11 @@ class PageController extends Controller
     public function contactSendMail(Request $request)
     {
 
+        // Honeypot anti-spam : le champ cache "website" doit rester vide.
+        if ($request->filled('website')) {
+            return back();
+        }
+
         $request->validate([
             'form_name'    => ['required', 'string', 'max:150'],
             'form_phone'   => ['nullable', 'string', 'max:30'],
@@ -492,10 +485,12 @@ class PageController extends Controller
           $this->m_sujet = $request->form_name;
           $this->reply_to = strtolower($request->email);
 
-          Mail::send('emails.contact_form',  ['form' => $form_data] , function ($message) {
+          $adresseContact = optional(Setting::first())->email ?: 'info@sofifran.org';
 
-              $message->from('info@sofifran.org', 'CONTACT SOFIFRAN' );
-              $message->to( 'info@sofifran.org', "Sofifran")->subject( htmlspecialchars( $this->m_sujet )  );
+          Mail::send('emails.contact_form',  ['form' => $form_data] , function ($message) use ($adresseContact) {
+
+              $message->from($adresseContact, 'CONTACT SOFIFRAN' );
+              $message->to( $adresseContact, "Sofifran")->subject( htmlspecialchars( $this->m_sujet )  );
               $message->replyTo( $this->reply_to );
           });
 
@@ -524,71 +519,18 @@ class PageController extends Controller
 
         $team_personnel = Team::Where('type_membre', 'Personnel')->orderBy('id', 'ASC')->get();
         $team_conseil_ad = Team::Where('type_membre', 'Conseil d\'administration')->orderBy('ordre', 'ASC')->get();
-        $team = Team::orderBy('ordre', 'ASC')->get();
-
         return view('pages.team')
         ->with('team_personnel', $team_personnel)
         ->with('baniere', $baniere)
-        ->with('team_conseil_ad', $team_conseil_ad)
-        ->with('team', $team);
+        ->with('team_conseil_ad', $team_conseil_ad);
 
     }
 
 
 
-    public function sondage()
-    {
-        return view('pages.sondage');
-    }
 
 
 
-    public function sondageCreate(Request $request)
-    {
-
-        if ( !isset($request->name) || empty($request->name) ) {
-
-            $request->session()->put('msg_error', 'Vous devez saisir le nom et prenom');
-
-        }elseif( !isset($request->email) || empty($request->email) ){
-
-            $request->session()->put('msg_error', 'Vous devez saisir un email valide');
-
-        }elseif (!isset($request->ville) || empty($request->ville)) {
-
-            $request->session()->put('msg_error', 'Vous devez saisir la ville');
-
-        }elseif (!isset($request->age) || empty($request->age)) {
-
-            $request->session()->put('msg_error', 'Vous devez saisir votre age');
-
-        }else{
-
-
-
-
-
-            //Insertion dans la base de donnees
-
-            Inscription::create([
-
-                'name' => $request->name,
-
-                'email' => $request->email,
-
-                'ville' => $request->ville,
-
-                'age' => $request->age,
-
-            ]);
-
-            $request->session()->flash('msg_success', 'Vous avez ajouté vos informations avec succès!');
-
-        }
-
-        return back();
-
-    }
 
 
 
@@ -627,13 +569,6 @@ class PageController extends Controller
 
 
 
-    public function forgot()
-
-    {
-
-        return view('admin.forgot-password');
-
-    }
 
 
     public function compteEmbed1()

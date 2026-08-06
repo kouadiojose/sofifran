@@ -47,7 +47,7 @@
               </div>
               <!-- /.card-header -->
               <div class="card-body">
-                  <img width="100%" class="" src="/assets/images/projects/{{ $post->image }}">
+                  <img width="100%" class="" src="/frontend/assets/images/projects/{{ $post->image }}">
               </div>
             </div>
           </div>

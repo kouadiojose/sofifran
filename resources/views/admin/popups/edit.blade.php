@@ -112,7 +112,6 @@
                           <div class="col-md-12">
                             <div class="form-group">
                                 <img src="/frontend/assets/images/popups/{{ $popup->image }}" width="80">
-                                <input type="hidden" value="{{ $popup->end }}" name="img_up">
                             </div>
                         </div>
                         <div class="col-md-12">

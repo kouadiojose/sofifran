@@ -48,8 +48,8 @@
       </form>
       <!-- /.social-auth-links -->
 
-      <p class="mb-1">
-        <a href="{{ route('admin-forgot') }}">Mot de passe oublié ?</a>
+      <p class="mb-1 text-muted">
+        <small>Mot de passe oublié ? Contactez l'administrateur principal.</small>
       </p>
     </div>
     <!-- /.login-card-body -->

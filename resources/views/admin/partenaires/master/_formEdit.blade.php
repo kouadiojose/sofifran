@@ -60,6 +60,10 @@
 
         <div class="form-group">
 
+          <label for="orders">Ordre d'affichage</label>
+
+          <input type="number" min="0" name="orders" value="{{ $partenaire->orders }}" class="form-control mb-3">
+
           <label for="link">Lien du site(Exemple: https://site.com ou http://site.com) *</label>
 
           <input type="text" name="link" value="{{ $partenaire->link }}" required="required" class="form-control" id="link">

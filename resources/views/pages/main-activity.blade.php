@@ -44,7 +44,7 @@
                         <h3 class="title"><a href="{{ route('sous-activites', $p->slug) }}">{{ app()->getLocale() == 'fr' ? $p->titre_fr: $p->titre_en }}</a></h3>
 
                         <p style="text-align: justify;">
-                            <?= app()->getLocale() == 'fr' ? $p->description_fr: $p->description_fr; ?>...
+                            <?= app()->getLocale() == 'fr' ? $p->description_fr: $p->description_en; ?>...
                         </p>
 
                         <a href="{{ route('sous-activites', $p->slug) }}" class="read-more-btn">{{ app()->getLocale() == 'fr' ? 'Voir Détails': 'See Details' }} <i class="flaticon-right-chevron"></i></a>

@@ -91,7 +91,7 @@
                         <div class="col-md-12">
                           <div class="form-group">
                             <?php if ( $atelier->image != Null ): ?>
-                              <img src="/assets/images/ateliers/{{ $atelier->image }}" width="200">
+                              <img src="/frontend/assets/images/ateliers/{{ $atelier->image }}" width="200">
                             <?php endif ?>
                             
 

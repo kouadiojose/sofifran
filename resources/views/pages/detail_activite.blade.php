@@ -60,11 +60,12 @@
                         <div class="article-footer">
 
                             <div class="article-share">
+                                @php $shareUrl = urlencode(url()->current()); @endphp
                                 <ul class="social">
                                     <li><span>{{ app()->getLocale() == 'fr' ? 'Partager': 'Share' }}:</span></li>
-                                    <li><a href="#" target="_blank"><i class="fi fi-brands-facebook"></i></a></li>
-                                    <li><a href="#" target="_blank"><i class="fi fi-brands-linkedin"></i></a></li>
-                                    <li><a href="#" target="_blank"><i class="fi fi-brands-instagram"></i></a></li>
+                                    <li><a href="https://www.facebook.com/sharer/sharer.php?u={{ $shareUrl }}" target="_blank" rel="noopener"><i class="fi fi-brands-facebook"></i></a></li>
+                                    <li><a href="https://www.linkedin.com/sharing/share-offsite/?url={{ $shareUrl }}" target="_blank" rel="noopener"><i class="fi fi-brands-linkedin"></i></a></li>
+                                    <li><a href="https://wa.me/?text={{ $shareUrl }}" target="_blank" rel="noopener"><i class="fi fi-brands-whatsapp"></i></a></li>
                                 </ul>
                             </div>
                         </div>
@@ -251,22 +252,12 @@
 
                 <div class="col-lg-4 col-md-12">
                     <aside class="widget-area" id="secondary">
-                        <section class="widget widget_search">
-                            <form class="search-form">
-                                <label>
-                                    <span class="screen-reader-text">{{ app()->getLocale() == 'fr' ? 'Rechercher pour': 'Search for' }}:</span>
-                                    <input type="search" class="search-field" placeholder="{{ app()->getLocale() == 'fr' ? 'Rechercher pour': 'Search for' }}...">
-                                </label>
-                                <button type="submit"><i class="fas fa-search"></i></button>
-                            </form>
-                        </section>
-
                         <section class="widget widget_pearo_posts_thumb">
                             <h3 class="widget-title">{{ app()->getLocale() == 'fr' ? 'Activités Populaires': 'Popular Activity' }}</h3>
 
                             @foreach( $activites as $b )
 	                            <article class="item">
-	                                <a href="{{ route('detail-blog', $b->slug) }}" class="thumb">
+	                                <a href="{{ route('detail-activites', [$b->categorie_activity_slug, $b->slug]) }}" class="thumb">
 	                                    <span class="fullimage cover" style="background: url('/frontend/assets/images/activites/{{ $b->image }}');" role="img"></span>
 	                                </a>
 	                                <div class="info">

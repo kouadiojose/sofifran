@@ -81,33 +81,7 @@
     </section>
     <!-- /.content -->
 
-  <div class="modal fade" id="del_role" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">Suppression de role</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <form action="{{ route('admin-user-del-role-valide') }}" id="del" method="post">
-
-            {{ csrf_field() }}
-            <input type="hidden" name="del_id" id="id">
-            <div class="modal-body">
-              <p> Voulez-vous supprimer cet role ? </p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Non</button>
-              <button type="submit" id="del" class="btn btn-primary">Oui</button>
-            </div>
-          </form>
-
-        </div>
-      </div>
-  </div>
-
-@endsection
+  @endsection
 
 @section('js')
 

@@ -11,7 +11,7 @@
                 <embed src="{{ $p->doc_url }}" width="100%" height="500" type="application/pdf"/>
 
                 <a target="_blank" href="{{ $p->doc_url }}" class="btn btn-primary btn-lg mt-2">
-                    <i class="icofont-eyes"></i>
+                    <i class="fas fa-eye"></i>
                     {{ app()->getLocale() == 'fr' ? ($p->titre_fr ?: $p->titre_en) : ($p->titre_en ?: $p->titre_fr) }}
                 </a>
             </div>

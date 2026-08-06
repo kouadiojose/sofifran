@@ -12,7 +12,7 @@
     <div class="row">
 
       <div class="form-group col-md-12">
-        <img src="/assets/images/temoignages/{{ $temoignage->image }}" width="90">
+        <img src="/frontend/assets/images/temoignages/{{ $temoignage->image }}" width="90">
       </div>
 
       <div class="form-group col-md-6">

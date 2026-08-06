@@ -11,16 +11,13 @@ use App\Models\Baniere;
 use App\Models\Blog;
 use App\Models\Categorie_activitie;
 use App\Models\Contact;
-use App\Models\Donate;
 use App\Models\Galerie;
 use App\Models\Galerie_photo;
 use App\Models\Galerie_video;
 use App\Models\Infolettre;
-use App\Models\Inscription;
 use App\Models\Partenaire;
 use App\Models\Partenaire_projet;
 use App\Models\Permission;
-use App\Models\Permission_role;
 use App\Models\Popup;
 use App\Models\Projet;
 use App\Models\Publication;
@@ -185,24 +182,9 @@ class AdminController extends Controller
 
     public function ViewProjet($id)
     {
-        $post  = Projet::where('id', $id)->first();
-        $dons  = Donate::where('projet_id', $id)->get();
-        $total = 0;
-
-        foreach ($dons as $value) {
-            $total += $value->gains;
-        }
-
-        $users = DB::table('users')
-            ->join('donates', 'donates.user_id', '=', 'users.id')
-            ->where('projet_id', $id)
-            // ->groupBy('name')
-            ->get();
+        $post = Projet::findOrFail($id);
 
         return view('admin.projets.view')
-            ->with('users', $users)
-            ->with('dons', $dons)
-            ->with('total', $total)
             ->with('post', $post);
     }
 
@@ -335,6 +317,11 @@ class AdminController extends Controller
 
     public function ValidTemoignage(Request $request)
     {
+        $request->validate([
+            'name'  => ['required', 'string'],
+            'photo' => ['required', 'image', 'max:8192'],
+        ]);
+
         $name = $this->uploadImage($request->file('photo'), '/frontend/assets/images/temoignages/', 90, 90);
 
         Temoignage::create([
@@ -421,14 +408,23 @@ class AdminController extends Controller
 
     public function ValidPartenaire(Request $request)
     {
+        $request->validate([
+            'name'  => ['required', 'string'],
+            'image' => ['required', 'image', 'max:8192'],
+        ]);
+
         $name = $this->uploadImage($request->file('image'), '/frontend/assets/images/partenaires/', 450, 300);
+
+        $ordre = $request->filled('orders')
+            ? (int) $request->orders
+            : ((int) DB::table('partenaires')->max('orders')) + 1;
 
         DB::table('partenaires')->insert([
             'name'  => $request->name,
             'image' => $name,
             'link'  => $request->link,
             'type'  => $request->type,
-            'orders'  => $request->orders,
+            'orders'  => $ordre,
             'created_at'  => now(),
             'updated_at'  => now(),
         ]);
@@ -449,13 +445,14 @@ class AdminController extends Controller
             ? $this->uploadImage($request->file('image'), '/frontend/assets/images/partenaires/', 450, 300)
             : $request->img_up;
 
+        $partenaireActuel = DB::table('partenaires')->where('id', $request->id)->first();
+
         DB::table('partenaires')->where('id', $request->id)->update([
             'name'  => $request->name,
             'image' => $name,
             'link'  => $request->link,
             'type'  => $request->type,
-            'orders'  => $request->orders,
-            'created_at'  => now(),
+            'orders'  => $request->filled('orders') ? (int) $request->orders : ($partenaireActuel->orders ?? 0),
             'updated_at'  => now(),
         ]);
 
@@ -585,11 +582,14 @@ class AdminController extends Controller
 
     public function ComposeMail(Request $request)
     {
-        // Liste d'adresses valides uniquement (le champ peut arriver
-        // sous forme de tableau ou de chaine "a@b.com,c@d.com").
+        // Destinataires : selection groupee et/ou adresse individuelle ("A:").
         $emails = is_array($request->mailgroupe)
             ? $request->mailgroupe
             : explode(',', (string) $request->mailgroupe);
+
+        if ($request->filled('to')) {
+            $emails[] = $request->to;
+        }
 
         $emails = array_values(array_filter(array_map('trim', $emails), function ($email) {
             return filter_var($email, FILTER_VALIDATE_EMAIL);
@@ -779,6 +779,12 @@ class AdminController extends Controller
 
     public function ValidBlog(Request $request)
     {
+        $request->validate([
+            'title_fr' => ['required', 'string'],
+            'title_en' => ['required', 'string'],
+            'image'    => ['required', 'image', 'max:8192'],
+        ]);
+
         $name = $this->uploadImage($request->file('image'), '/frontend/assets/images/blog/', 850, 550);
 
         Blog::create([
@@ -988,6 +994,12 @@ class AdminController extends Controller
 
     public function GalerieVideoCreate(Request $request)
     {
+        $request->validate([
+            'titre_fr'    => ['required', 'string'],
+            'link_video'  => ['required', 'string'],
+            'image_video' => ['required', 'image', 'max:8192'],
+        ]);
+
         $last_word = $this->extractYoutubeId($request->link_video);
 
         $name = $this->uploadImage($request->file('image_video'), '/frontend/assets/images/gallery/video/', 850, 550);
@@ -1172,6 +1184,12 @@ class AdminController extends Controller
 
     public function ValidActivite(Request $request)
     {
+        $request->validate([
+            'title_fr' => ['required', 'string'],
+            'title_en' => ['required', 'string'],
+            'image'    => ['required', 'image', 'max:8192'],
+        ]);
+
         $name = $this->uploadImage($request->file('image'), '/frontend/assets/images/activites/', 850, 550);
 
         Activite::create([
@@ -1371,6 +1389,12 @@ class AdminController extends Controller
 
     public function UserEditValide(Request $request)
     {
+        $request->validate([
+            'name'  => ['required', 'string', 'max:150'],
+            'email' => ['required', 'email', 'unique:admins,email,' . (int) $request->user_id],
+            'role'  => ['required', 'exists:roles,id'],
+        ]);
+
         Admin::where('id', $request->user_id)->update([
             'name'    => $request->name,
             'email'   => $request->email,
@@ -1398,6 +1422,8 @@ class AdminController extends Controller
 
     public function ValidRole(Request $request)
     {
+        $request->validate(['name' => ['required', 'string', 'max:100']]);
+
         Role::create([
             'code'        => Str::slug($request->name),
             'name'        => $request->name,
@@ -1421,6 +1447,8 @@ class AdminController extends Controller
 
     public function EditValidRole(Request $request)
     {
+        $request->validate(['name' => ['required', 'string', 'max:100']]);
+
         Role::where('id', $request->role_id)->update([
             'code'        => Str::slug($request->name),
             'name'        => $request->name,
@@ -1497,6 +1525,13 @@ class AdminController extends Controller
 
     public function UserValide(Request $request)
     {
+        $request->validate([
+            'name'     => ['required', 'string', 'max:150'],
+            'email'    => ['required', 'email', 'unique:admins,email'],
+            'password' => ['required', 'string', 'min:8'],
+            'role'     => ['required', 'exists:roles,id'],
+        ]);
+
         if ($request->password === $request->repassword) {
             Admin::create([
                 'name'    => $request->name,
@@ -1521,6 +1556,10 @@ class AdminController extends Controller
     public function ChangePassword(Request $request)
     {
         $admin = Auth::guard('admin')->user();
+
+        $request->validate([
+            'new_password' => ['required', 'string', 'min:8'],
+        ]);
 
         if (Hash::check($request->old_password, $admin->password)) {
             if ($request->new_password === $request->conf_password) {
@@ -1554,6 +1593,11 @@ class AdminController extends Controller
 
     public function teamCreateValid(Request $request)
     {
+        $request->validate([
+            'nom'   => ['required', 'string'],
+            'photo' => ['required', 'image', 'max:8192'],
+        ]);
+
         $name = $this->uploadImage($request->file('photo'), '/frontend/assets/images/team/', 300, 266);
 
         Team::create([
@@ -1658,15 +1702,6 @@ class AdminController extends Controller
     /** FIN A PROPOS **/
 
     /** INSCRIPTION MEH **/
-    public function inscriptionMeh()
-    {
-        $inscrits = DB::table('inscription_events')
-            ->where('id', '>', 26)
-            ->orderBy('id', 'DESC')
-            ->get();
-
-        return view('admin.inscriptions.index')->with('inscrits', $inscrits);
-    }
 
     public function inscription()
     {

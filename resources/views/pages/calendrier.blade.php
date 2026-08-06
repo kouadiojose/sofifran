@@ -53,7 +53,7 @@
 
             @php
                 $date  = new DateTime($a->start);
-                $heure = new DateTime($a->hour_start);
+                $heure = $a->hour_start ? new DateTime($a->hour_start) : null;
                 $mois  = app()->getLocale() == 'fr' ? $mois_fr[(int) $date->format('n')] : $mois_en[(int) $date->format('n')];
             @endphp
 
@@ -79,7 +79,7 @@
                                     <div class="d-table-cell">
                                         <span>{{ $date->format('d') }}</span>
                                         <h3>{{ $mois }} {{ $date->format('Y') }}</h3>
-                                        <p>{{ $heure->format('H') }}H</p>
+                                        @if($heure)<p>{{ $heure->format('H') }}H</p>@endif
                                         <i class="flaticon-timetable"></i>
                                     </div>
                                 </div>

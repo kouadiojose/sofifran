@@ -42,6 +42,8 @@
                                     <li class="nav-item"><a href="{{ route('about') }}" class="nav-link">{{ app()->getLocale() == 'fr' ? 'Qui Sommes-nous ?': 'Who We Are ?' }}</a></li>
                                     <li class="nav-item"><a href="{{ route('team') }}" class="nav-link">{{ app()->getLocale() == 'fr' ? 'Notre Equipe': 'Our Team' }}</a></li>
                                     <li class="nav-item"><a href="{{ route('partenaires') }}" class="nav-link">{{ app()->getLocale() == 'fr' ? 'Nos Partenaires': 'Our Partners' }}</a></li>
+
+                                    <li class="nav-item"><a href="{{ route('temoignage') }}" class="nav-link">{{ app()->getLocale() == 'fr' ? 'Témoignages': 'Testimonials' }}</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item"><a href="{{ route('activites') }}" class="nav-link"> {{ app()->getLocale() == 'fr' ? 'Activités': 'Activity' }}</a></li>
@@ -67,6 +69,8 @@
 
                                     <li class="nav-item"><a href="{{ route('communique') }}" class="nav-link">{{ app()->getLocale() == 'fr' ? 'Communiqués': 'News' }}</a></li>
                                     <li class="nav-item"><a href="{{ route('article_presse') }}" class="nav-link">{{ app()->getLocale() == 'fr' ? 'Articles de presse': 'Press articles' }}</a></li>
+                                    <li class="nav-item"><a href="{{ route('publication') }}" class="nav-link">{{ app()->getLocale() == 'fr' ? 'Toutes les publications': 'All publications' }}</a></li>
+
                                     <li class="nav-item"><a href="{{ route('infolettre') }}" class="nav-link">{{ app()->getLocale() == 'fr' ? 'Lettre Information': 'Infolettre' }}</a></li>
                                     <li class="nav-item"><a href="{{ route('compteEmbed1') }}" class="nav-link">{{ app()->getLocale() == 'fr' ? 'Recueil de Conte': 'Collection of Tales' }}</a></li>
                                     <li class="nav-item"><a href="{{ route('carrers') }}" class="nav-link">{{ app()->getLocale() == 'fr' ? 'Offres d\'emplois': 'Carrers' }}</a></li>

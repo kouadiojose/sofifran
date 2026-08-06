@@ -13,20 +13,18 @@ Route::prefix('admin-sofifran')->group(function () {
 
         Route::get('/login', [PageController::class, 'login'])->name('admin-login');
 
-        Route::post('/login-verif', [AdminLoginController::class, 'login'])->name('login-submit');
-
-        Route::get('/forgot', [PageController::class, 'forgot'])->name('admin-forgot');
-
-        Route::get('/renew', function () {
-            return view('admin.renew-password');
-        })->name('admin-renew');
+        // throttle : protege le login admin du brute force (5 essais/minute)
+        Route::post('/login-verif', [AdminLoginController::class, 'login'])
+            ->middleware('throttle:5,1')
+            ->name('login-submit');
     });
 
     /* ---------- Routes protégées (admin connecté) ---------- */
 
     Route::middleware('auth:admin')->group(function () {
 
-        Route::get('/logout', [AdminLoginController::class, 'logout'])->name('admin-logout');
+        // POST + CSRF : une deconnexion ne doit pas etre declenchable par un simple lien externe
+        Route::post('/logout', [AdminLoginController::class, 'logout'])->name('admin-logout');
 
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin-dashboard');
 
