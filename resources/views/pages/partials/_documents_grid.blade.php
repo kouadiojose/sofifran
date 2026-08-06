@@ -21,27 +21,27 @@
                             <img loading="lazy" src="{{ $p->cover_url }}" alt="{{ $titre }}">
                         @else
                             <span class="doc-cover-placeholder">
-                                <i class="fas fa-file-pdf"></i>
+                                <i class="fi fi-br-document"></i>
                                 <em>{{ \Illuminate\Support\Str::limit($titre, 60) }}</em>
                             </span>
                         @endif
-                        <span class="doc-cover-overlay"><i class="fas fa-eye"></i> {{ $fr ? 'Consulter' : 'View' }}</span>
+                        <span class="doc-cover-overlay"><i class="fi fi-br-eye"></i> {{ $fr ? 'Consulter' : 'View' }}</span>
                     </a>
 
                     <div class="doc-body">
                         <h3 class="doc-title" title="{{ $titre }}">{{ $titre }}</h3>
 
                         <div class="doc-meta">
-                            @if($date)<span><i class="far fa-calendar"></i> {{ $date }}</span>@endif
-                            <span><i class="far fa-file-pdf"></i> PDF{{ $taille ? ' · ' . $taille : '' }}</span>
+                            @if($date)<span><i class="fi fi-br-calendar"></i> {{ $date }}</span>@endif
+                            <span><i class="fi fi-br-document"></i> PDF{{ $taille ? ' · ' . $taille : '' }}</span>
                         </div>
 
                         <div class="doc-actions">
                             <a href="{{ $p->doc_url }}" target="_blank" rel="noopener" class="doc-btn doc-btn-primary">
-                                <i class="fas fa-eye"></i> {{ $fr ? 'Consulter' : 'View' }}
+                                <i class="fi fi-br-eye"></i> {{ $fr ? 'Consulter' : 'View' }}
                             </a>
                             <a href="{{ $p->doc_url }}" download class="doc-btn doc-btn-outline">
-                                <i class="fas fa-download"></i> {{ $fr ? 'Télécharger' : 'Download' }}
+                                <i class="fi fi-br-download"></i> {{ $fr ? 'Télécharger' : 'Download' }}
                             </a>
                         </div>
                     </div>

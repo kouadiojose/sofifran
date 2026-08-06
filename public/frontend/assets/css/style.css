@@ -12864,3 +12864,11 @@ Go Top CSS
   color: #1A1789 !important;
 }
 .doc-btn-outline:hover { border-color: #FF6E5D; color: #FF6E5D !important; }
+
+/* Alignement des uicons dans les cartes de documents */
+.doc-card i[class^="fi"] {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+.doc-cover-placeholder i { font-size: 48px; }
