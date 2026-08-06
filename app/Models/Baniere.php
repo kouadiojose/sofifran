@@ -7,10 +7,30 @@ use Illuminate\Database\Eloquent\Model;
 class Baniere extends Model
 {
     /**
-     * Correspondance page -> id de banniere en base.
-     * Centralise les identifiants qui etaient disperses en "magic numbers"
-     * dans les controleurs. Les ids correspondent aux banieres existantes
-     * de la table (gerees dans Admin > Rubriques > Banieres).
+     * Catalogue des pages du site pouvant recevoir une banniere.
+     * La cle est stockee dans la colonne "page" ; le libelle sert a l'admin.
+     */
+    public const PAGE_LABELS = [
+        'temoignage'    => 'Témoignages',
+        'activites'     => 'Activités',
+        'calendrier'    => 'Calendrier',
+        'equipe'        => 'Notre équipe',
+        'about'         => 'Qui sommes-nous',
+        'contact'       => 'Contact',
+        'partenaire'    => 'Nos partenaires',
+        'atelier'       => 'Évènements / Ateliers',
+        'projets'       => 'Projets',
+        'presse'        => 'Presse',
+        'publication'   => 'Publications',
+        'galerie-photo' => 'Galerie photos',
+        'galerie-video' => 'Galerie vidéos',
+        'blog'          => 'Blogue - Actualités',
+        'engagez'       => 'Engagez-vous',
+    ];
+
+    /**
+     * Correspondance historique page -> id, utilisee comme repli tant que la
+     * migration de normalisation de la colonne "page" n'a pas ete executee.
      */
     public const PAGES = [
         'temoignage'    => 1,
@@ -37,10 +57,25 @@ class Baniere extends Model
         'page',
     ];
 
+    /**
+     * Banniere d'une page du site : recherche par cle de page (dynamique),
+     * avec repli sur l'ancien id fixe pour les bases non migrees.
+     */
     public static function forPage(string $page): ?self
     {
+        $baniere = self::where('page', $page)->orderBy('id')->first();
+
+        if ($baniere) {
+            return $baniere;
+        }
+
         $id = self::PAGES[$page] ?? null;
 
         return $id ? self::find($id) : null;
+    }
+
+    public function getPageLabelAttribute(): string
+    {
+        return self::PAGE_LABELS[$this->page] ?? ($this->page ?: 'Non assignée');
     }
 }

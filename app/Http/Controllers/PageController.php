@@ -109,6 +109,7 @@ class PageController extends Controller
     {
 
         return view('pages.infolettre')
+        ->with('baniere', Baniere::forPage('publication'))
         ->with('pubs', Publication::where('type', 'infolettre')->orderBy('date_pub', 'DESC')->get());
 
     }
@@ -356,22 +357,26 @@ class PageController extends Controller
     public function rapport_annuel()
     {
         return view('pages.rapport_annuel')
+        ->with('baniere', Baniere::forPage('publication'))
         ->with('pubs', Publication::where('type', 'rapport-annuel')->orderBy('date_pub', 'DESC')->get());
     }
     public function rapport_projet()
     {
         return view('pages.rapport_projet')
+        ->with('baniere', Baniere::forPage('publication'))
         ->with('pubs', Publication::where('type', 'rapport-projet')->orderBy('date_pub', 'DESC')->get());
     }
     public function communique()
     {
         return view('pages.communique')
+        ->with('baniere', Baniere::forPage('presse'))
         ->with('pubs', Publication::where('type', 'communique')->orderBy('date_pub', 'DESC')->get());
     }
 
     public function article_presse()
     {
         return view('pages.article_presse')
+        ->with('baniere', Baniere::forPage('presse'))
         ->with('pubs', Publication::where('type', 'article-presse')->orderBy('date_pub', 'DESC')->get());
     }
 
@@ -641,6 +646,7 @@ class PageController extends Controller
     {
 
         return view('pages.carrers')
+        ->with('baniere', Baniere::forPage('publication'))
         ->with('pubs', Publication::where('type', 'emploi')->orderBy('date_pub', 'DESC')->get());
 
     }
