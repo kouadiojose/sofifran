@@ -34,6 +34,7 @@ use App\Models\Sous_activite;
 use App\Models\Team;
 use App\Models\Temoignage;
 use App\Models\User;
+use App\Models\Visite;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
@@ -126,7 +127,19 @@ class AdminController extends Controller
 
         $derniersContacts = Contact::latest()->take(5)->get();
 
+        // Statistiques de visites (0 tant que la migration n'est pas lancee).
+        $visitesAujourdhui = 0;
+        $visites30j        = 0;
+        try {
+            $visitesAujourdhui = Visite::whereDate('created_at', now()->format('Y-m-d'))->count();
+            $visites30j        = Visite::where('created_at', '>=', now()->subDays(29)->startOfDay())->count();
+        } catch (\Throwable $e) {
+            // table visites absente
+        }
+
         return view('admin.dashboard')
+            ->with('visitesAujourdhui', $visitesAujourdhui)
+            ->with('visites30j', $visites30j)
             ->with('countPorjetEnd', $countPorjetEnd)
             ->with('countPorjetCours', $countPorjetCours)
             ->with('countActivite', $countActivite)
@@ -849,18 +862,52 @@ class AdminController extends Controller
     }
     /** FIN BLOG/ACTUALITES **/
 
-    /** GALERIE **/
+    /** GALERIE (organisee en albums : 1 activite = 1 album) **/
     public function galerie()
     {
-        $galerie = Galerie_photo::join('activites', 'activites.id', '=', 'galerie_photos.galerie_id')
-            ->select('galerie_photos.*', 'activites.title_fr as titre', 'activites.image as img_activite')
+        $albums = Activite::withCount('photos')
+            ->orderBy('id', 'DESC')
             ->get();
 
-        $headerActivite = DB::table('entete_activites')->first();
+        $totalPhotos = Galerie_photo::count();
 
         return view('admin.galeries.list')
-            ->with('headerActivite', $headerActivite)
-            ->with('galerie', $galerie);
+            ->with('totalPhotos', $totalPhotos)
+            ->with('albums', $albums);
+    }
+
+    /**
+     * Convertit une valeur php.ini du type "8M" / "2G" en octets.
+     */
+    private function iniToBytes(string $value): int
+    {
+        $value = trim($value);
+        $unit  = strtolower(substr($value, -1));
+        $num   = (float) $value;
+
+        return (int) match ($unit) {
+            'g' => $num * 1024 * 1024 * 1024,
+            'm' => $num * 1024 * 1024,
+            'k' => $num * 1024,
+            default => $num,
+        };
+    }
+
+    public function galerieAlbum($id)
+    {
+        $album  = Activite::withCount('photos')->findOrFail($id);
+        $photos = Galerie_photo::where('galerie_id', $id)->orderBy('id', 'DESC')->get();
+
+        // Limites d'upload effectives du serveur, affichees et verifiees
+        // cote client pour eviter un rejet PHP (PostTooLargeException).
+        $maxPostBytes = $this->iniToBytes(ini_get('post_max_size'));
+        $maxFileBytes = $this->iniToBytes(ini_get('upload_max_filesize'));
+
+        return view('admin.galeries.album')
+            ->with('album', $album)
+            ->with('photos', $photos)
+            ->with('maxPostBytes', $maxPostBytes)
+            ->with('maxFileBytes', $maxFileBytes);
     }
 
     public function CreateGalerie()
@@ -873,18 +920,24 @@ class AdminController extends Controller
 
     public function ValidGalerie(Request $request)
     {
-        if ($request->hasFile('photos')) {
-            foreach ($request->file('photos') as $photo) {
-                $name = $this->uploadImage($photo, '/frontend/assets/images/gallery/photos/', 850, 550);
+        $request->validate([
+            'activite'  => ['required', 'integer', 'exists:activites,id'],
+            'photos'    => ['required', 'array'],
+            'photos.*'  => ['image', 'max:8192'],
+        ]);
 
-                Galerie_photo::create([
-                    'image'      => $name,
-                    'galerie_id' => $request->activite,
-                ]);
-            }
+        $count = 0;
+        foreach ($request->file('photos') as $photo) {
+            $name = $this->uploadImage($photo, '/frontend/assets/images/gallery/photos/', 850, 550);
+
+            Galerie_photo::create([
+                'image'      => $name,
+                'galerie_id' => $request->activite,
+            ]);
+            $count++;
         }
 
-        $request->session()->flash('msg', 'Vous avez ajouté des photos de galerie avec succès!');
+        $request->session()->flash('msg', $count . ' photo(s) ajoutée(s) à l\'album avec succès!');
         return back();
     }
 
@@ -1755,6 +1808,76 @@ class AdminController extends Controller
 
         return view('admin.contacts.list')
             ->with('contacts', $contacts);
+    }
+
+    /** --------------------------------
+     *     STATISTIQUES DE VISITES
+     * --------------------------------*/
+    public function visites()
+    {
+        $today   = now()->format('Y-m-d');
+        $depuis  = now()->subDays(29)->startOfDay();
+
+        // Compteurs globaux
+        $visitesAujourdhui   = Visite::whereDate('created_at', $today)->count();
+        $visiteursAujourdhui = Visite::whereDate('created_at', $today)->distinct('visitor_hash')->count('visitor_hash');
+        $visites30j          = Visite::where('created_at', '>=', $depuis)->count();
+        $visiteurs30j        = Visite::where('created_at', '>=', $depuis)->distinct('visitor_hash')->count('visitor_hash');
+        $visitesTotal        = Visite::count();
+
+        // Evolution jour par jour sur 30 jours (jours sans visite = 0)
+        $parJour = Visite::where('created_at', '>=', $depuis)
+            ->selectRaw('DATE(created_at) as jour, COUNT(*) as total')
+            ->groupBy('jour')
+            ->pluck('total', 'jour');
+
+        $chartLabels = [];
+        $chartData   = [];
+        for ($i = 29; $i >= 0; $i--) {
+            $d = now()->subDays($i)->format('Y-m-d');
+            $chartLabels[] = now()->subDays($i)->format('d/m');
+            $chartData[]   = (int) ($parJour[$d] ?? 0);
+        }
+
+        // Pages les plus visitees (30 jours)
+        $topPages = Visite::where('created_at', '>=', $depuis)
+            ->selectRaw('page, COUNT(*) as total')
+            ->groupBy('page')
+            ->orderByDesc('total')
+            ->limit(10)
+            ->get();
+
+        // Sources de trafic (30 jours) : referents externes + acces directs
+        $sources = Visite::where('created_at', '>=', $depuis)
+            ->whereNotNull('referer_host')
+            ->selectRaw('referer_host, COUNT(*) as total')
+            ->groupBy('referer_host')
+            ->orderByDesc('total')
+            ->limit(10)
+            ->get();
+
+        $accesDirects = Visite::where('created_at', '>=', $depuis)
+            ->whereNull('referer_host')
+            ->count();
+
+        // Appareils et navigateurs (30 jours)
+        $appareils = Visite::where('created_at', '>=', $depuis)
+            ->selectRaw('device, COUNT(*) as total')
+            ->groupBy('device')
+            ->orderByDesc('total')
+            ->get();
+
+        $navigateurs = Visite::where('created_at', '>=', $depuis)
+            ->selectRaw('browser, COUNT(*) as total')
+            ->groupBy('browser')
+            ->orderByDesc('total')
+            ->limit(8)
+            ->get();
+
+        return view('admin.visites.index', compact(
+            'visitesAujourdhui', 'visiteursAujourdhui', 'visites30j', 'visiteurs30j', 'visitesTotal',
+            'chartLabels', 'chartData', 'topPages', 'sources', 'accesDirects', 'appareils', 'navigateurs'
+        ));
     }
 
 }

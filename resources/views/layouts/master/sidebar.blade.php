@@ -2,13 +2,22 @@
 
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
 
+    @php
+      // Logo gere dans Admin > General (settings.logo), avec repli sur le
+      // logo blanc embarque si le fichier configure est absent.
+      $sidebarLogo = '/frontend/assets/images/logo-white.png';
+      if (!empty($setting?->logo) && file_exists(public_path('frontend/assets/images/' . $setting->logo))) {
+          $sidebarLogo = '/frontend/assets/images/' . $setting->logo;
+      }
+    @endphp
+
     <!-- Brand Logo -->
 
-    <a href="{{ route('admin-dashboard') }}" class="brand-link">
+    <a href="{{ route('admin-dashboard') }}" class="brand-link text-center">
 
-      <img src="/admin/dist/img/AdminLTELogo.png" alt="Admin-Sofifran Logo" class="brand-image img-circle elevation-3"
+      <img src="{{ $sidebarLogo }}" alt="Logo Sofifran" class="brand-image"
 
-           style="opacity: .8">
+           style="opacity: .9; max-height: 33px; width: auto; float: none;">
 
       <span class="brand-text font-weight-light">Admin Sofifran</span>
 
@@ -20,19 +29,19 @@
 
     <div class="sidebar">
 
-      <!-- Sidebar user panel (optional) -->
+      <!-- Sidebar user panel -->
 
-      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
 
         <div class="image">
 
-          <img src="https://sofifran.org/assets/images/logo-light.png" class="img-circle elevation-2" alt="User Image">
+          <img src="{{ $sidebarLogo }}" class="elevation-2" alt="Logo Sofifran" style="max-height: 34px; width: auto; border-radius: 4px; background: rgba(255,255,255,.9); padding: 2px;">
 
         </div>
 
         <div class="info">
 
-          <a href="#" class="d-block">Sofifran</a>
+          <a href="{{ route('admin-dashboard') }}" class="d-block">{{ auth('admin')->user()->name ?? 'Sofifran' }}</a>
 
         </div>
 
@@ -61,6 +70,22 @@
               <p>
 
                 Tableau de Bord
+
+              </p>
+
+            </a>
+
+          </li>
+
+          <li class="nav-item">
+
+            <a href="{{ route('admin-visites') }}" class="nav-link" id="Li_visites">
+
+              <i class="nav-icon fas fa-chart-line"></i>
+
+              <p>
+
+                Statistiques de visites
 
               </p>
 

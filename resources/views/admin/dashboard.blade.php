@@ -227,6 +227,35 @@
 
         <div class="row">
 
+          <div class="col-12 col-sm-6">
+            <a href="{{ route('admin-visites') }}" class="text-dark">
+              <div class="info-box">
+                <span class="info-box-icon bg-gradient-primary elevation-1"><i class="fas fa-eye"></i></span>
+                <div class="info-box-content">
+                  <span class="info-box-text">Visites du site aujourd'hui</span>
+                  <span class="info-box-number">{{ number_format($visitesAujourdhui, 0, ',', ' ') }}</span>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div class="col-12 col-sm-6">
+            <a href="{{ route('admin-visites') }}" class="text-dark">
+              <div class="info-box">
+                <span class="info-box-icon bg-gradient-info elevation-1"><i class="fas fa-chart-line"></i></span>
+                <div class="info-box-content">
+                  <span class="info-box-text">Visites sur les 30 derniers jours</span>
+                  <span class="info-box-number">{{ number_format($visites30j, 0, ',', ' ') }} <small class="text-muted">— voir les statistiques détaillées</small></span>
+                </div>
+              </div>
+            </a>
+          </div>
+
+        </div>
+        <!-- /.row -->
+
+        <div class="row">
+
           <div class="col-md-12">
             <div class="card card-primary card-outline">
               <div class="card-header">

@@ -32,6 +32,8 @@ Route::prefix('admin-sofifran')->group(function () {
 
         Route::get('/nos-contacts', [AdminController::class, 'Noscontacts'])->name('admin-list-contacts');
 
+        Route::get('/statistiques', [AdminController::class, 'visites'])->name('admin-visites');
+
         /*** Equipe ***/
         Route::get('/team', [AdminController::class, 'team'])->name('admin-equipe');
         Route::get('/team/create', [AdminController::class, 'teamCreate'])->name('admin-equipe-create');
@@ -119,6 +121,7 @@ Route::prefix('admin-sofifran')->group(function () {
 
         /*** Galerie ***/
         Route::get('/galerie', [AdminController::class, 'galerie'])->name('admin-galerie');
+        Route::get('/galerie/album/{id}', [AdminController::class, 'galerieAlbum'])->name('admin-galerie-album');
         Route::post('/galerie/header-activite', [AdminController::class, 'EdtiteActiviteHeader'])->name('admin-edit-headeractivite');
         Route::get('/galerie/create', [AdminController::class, 'CreateGalerie'])->name('admin-galerie-create');
         Route::get('/galerie/edit/{id}', [AdminController::class, 'EditGalerie'])->name('admin-galerie-edit');
