@@ -111,20 +111,44 @@ class AdminController extends Controller
         return $slug;
     }
 
+    /**
+     * Serie "visites par jour" des 30 derniers jours pour le graphique
+     * (labels jj/mm + totaux, jours sans visite a zero).
+     */
+    private function visitesChartData(): array
+    {
+        $labels = [];
+        $data   = [];
+
+        try {
+            $parJour = Visite::where('created_at', '>=', now()->subDays(29)->startOfDay())
+                ->selectRaw('DATE(created_at) as jour, COUNT(*) as total')
+                ->groupBy('jour')
+                ->pluck('total', 'jour');
+        } catch (\Throwable $e) {
+            $parJour = collect(); // table visites absente
+        }
+
+        for ($i = 29; $i >= 0; $i--) {
+            $d        = now()->subDays($i)->format('Y-m-d');
+            $labels[] = now()->subDays($i)->format('d/m');
+            $data[]   = (int) ($parJour[$d] ?? 0);
+        }
+
+        return [$labels, $data];
+    }
+
     public function dashboard()
     {
         $countPorjetCours = Projet::where('ended', 'no')->count();
         $countPorjetEnd   = Projet::where('ended', 'yes')->count();
         $countActivite    = Activite::count();
-        // L'ancien code comptait les popups sous l'etiquette "Publications".
         $countPub         = Publication::count();
 
         $countContacts    = Contact::count();
         $countInfolettre  = Infolettre::count();
         $countTemoignages = Temoignage::count();
         $countEvenements  = Atelier::where('start', '>=', now()->format('Y-m-d'))->count();
-
-        $derniersContacts = Contact::latest()->take(5)->get();
 
         // Statistiques de visites (0 tant que la migration n'est pas lancee).
         $visitesAujourdhui = 0;
@@ -136,9 +160,13 @@ class AdminController extends Controller
             // table visites absente
         }
 
+        [$chartLabels, $chartData] = $this->visitesChartData();
+
         return view('admin.dashboard')
             ->with('visitesAujourdhui', $visitesAujourdhui)
             ->with('visites30j', $visites30j)
+            ->with('chartLabels', $chartLabels)
+            ->with('chartData', $chartData)
             ->with('countPorjetEnd', $countPorjetEnd)
             ->with('countPorjetCours', $countPorjetCours)
             ->with('countActivite', $countActivite)
@@ -146,8 +174,7 @@ class AdminController extends Controller
             ->with('countContacts', $countContacts)
             ->with('countInfolettre', $countInfolettre)
             ->with('countTemoignages', $countTemoignages)
-            ->with('countEvenements', $countEvenements)
-            ->with('derniersContacts', $derniersContacts);
+            ->with('countEvenements', $countEvenements);
     }
 
     /** --------------------------------
@@ -1844,18 +1871,7 @@ class AdminController extends Controller
         $visitesTotal        = Visite::count();
 
         // Evolution jour par jour sur 30 jours (jours sans visite = 0)
-        $parJour = Visite::where('created_at', '>=', $depuis)
-            ->selectRaw('DATE(created_at) as jour, COUNT(*) as total')
-            ->groupBy('jour')
-            ->pluck('total', 'jour');
-
-        $chartLabels = [];
-        $chartData   = [];
-        for ($i = 29; $i >= 0; $i--) {
-            $d = now()->subDays($i)->format('Y-m-d');
-            $chartLabels[] = now()->subDays($i)->format('d/m');
-            $chartData[]   = (int) ($parJour[$d] ?? 0);
-        }
+        [$chartLabels, $chartData] = $this->visitesChartData();
 
         // Pages les plus visitees (30 jours)
         $topPages = Visite::where('created_at', '>=', $depuis)
