@@ -94,17 +94,11 @@
         <div class="row">
             <div class="col-lg-5 col-md-12">
                 <div class="why-choose-us-slides owl-carousel owl-theme">
-                    <div class="why-choose-us-image bg1">
-                        <img loading="lazy" src="assets/img/why-choose-img1.jpg" alt="image">
-                    </div>
+                    <div class="why-choose-us-image bg1" @if($apropos?->image_objectif1) style="background-image: url('/frontend/assets/images/resource/{{ $apropos->image_objectif1 }}');" @endif></div>
 
-                    <div class="why-choose-us-image bg2">
-                        <img loading="lazy" src="assets/img/why-choose-img2.jpg" alt="image">
-                    </div>
+                    <div class="why-choose-us-image bg2" @if($apropos?->image_objectif2) style="background-image: url('/frontend/assets/images/resource/{{ $apropos->image_objectif2 }}');" @endif></div>
 
-                    <div class="why-choose-us-image bg3">
-                        <img loading="lazy" src="assets/img/why-choose-img3.jpg" alt="image">
-                    </div>
+                    <div class="why-choose-us-image bg3" @if($apropos?->image_objectif3) style="background-image: url('/frontend/assets/images/resource/{{ $apropos->image_objectif3 }}');" @endif></div>
                 </div>
             </div>
 

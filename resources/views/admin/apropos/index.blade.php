@@ -115,6 +115,23 @@
                     </div>
                   </div>
 
+                  <h6 class="text-muted mt-2">Carrousel de la section « Nos Objectifs » (3 images qui défilent)</h6>
+                  <div class="row">
+                    @foreach([1, 2, 3] as $n)
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>Image {{ $n }} du carrousel</label><br>
+                        @if($apropos->{'image_objectif'.$n})
+                          <img src="/frontend/assets/images/resource/{{ $apropos->{'image_objectif'.$n} }}" width="100%" style="max-width: 260px; border-radius: 8px;" class="mb-2"><br>
+                        @else
+                          <p class="text-muted mb-2"><em>Image du thème utilisée par défaut</em></p>
+                        @endif
+                        <input type="file" name="image_objectif{{ $n }}" accept="image/*" class="form-control">
+                      </div>
+                    </div>
+                    @endforeach
+                  </div>
+
                   <h5 class="text-primary border-bottom pb-2 mt-4">Notre Historique</h5>
                   <div class="row">
                     <div class="col-md-6">
