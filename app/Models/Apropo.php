@@ -14,7 +14,20 @@ class Apropo extends Model
         'mission_fr', 'mission_en',
         'mandat_fr', 'mandat_en',
         'objectifs_fr', 'objectifs_en',
+        'image_intro', 'image_mission', 'image_mandat',
     ];
+
+    /**
+     * URL d'une image de section, avec repli sur l'image historique du theme.
+     */
+    public function imageUrl(string $champ, string $fallback): string
+    {
+        $image = $this->{$champ};
+
+        return $image
+            ? '/frontend/assets/images/resource/' . $image
+            : $fallback;
+    }
 
     /**
      * Valeur d'une section dans la langue courante, avec repli sur le

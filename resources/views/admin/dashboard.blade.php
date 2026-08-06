@@ -118,7 +118,7 @@
                     <span class="badge badge-secondary badge-pill">{{ $countTemoignages }}</span>
                   </li>
                   <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <a href="{{ route('admin-atelier-list') }}">Évènements à venir</a>
+                    <a href="{{ route('admin-atelier') }}">Évènements à venir</a>
                     <span class="badge badge-warning badge-pill">{{ $countEvenements }}</span>
                   </li>
                 </ul>
