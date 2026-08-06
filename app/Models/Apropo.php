@@ -15,6 +15,7 @@ class Apropo extends Model
         'mandat_fr', 'mandat_en',
         'objectifs_fr', 'objectifs_en',
         'image_intro', 'image_mission', 'image_mandat',
+        'image_objectif1', 'image_objectif2', 'image_objectif3',
     ];
 
     /**

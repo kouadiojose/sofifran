@@ -31,8 +31,6 @@
 
 @section('css')
 
-<link href='/frontend/assets/calendar/main.css' rel='stylesheet'/>
-
 <link href="https://fonts.googleapis.com/css2?family=Unica+One&display=swap" rel="stylesheet">
 
 
@@ -744,93 +742,6 @@
 
 @section('js')
 
-  <script src='/frontend/assets/calendar/main.js'></script>
-
-  <script src='/frontend/assets/calendar/locales-all.js'></script>
-
-  <script>
-
-    document.addEventListener('DOMContentLoaded', function() {
-
-
-
-      var calendarEl = document.getElementById('calendar');
-
-
-
-      var calendar = new FullCalendar.Calendar(calendarEl, {
-
-
-
-        initialView: 'dayGridMonth',
-
-
-
-        events: [
-
-
-
-
-
-
-
-              {
-
-
-
-                  title : "Célébration  fête des mères",
-
-
-
-                  start : '2025-02-21',
-
-
-
-                  color: "#007bff",
-
-
-
-                  url: "https://sofifran.org/atelier/emergence-57450",
-
-
-
-
-
-                          end: '2025-02-27',
-
-
-
-
-
-              },
-
-
-
-
-
-
-
-
-
-      ],
-
-
-
-      });
-
-
-
-      calendar.render();
-
-
-
-      calendar.setOption('locale', 'fr');
-
-
-
-    });
-
-  </script>
 
   
 

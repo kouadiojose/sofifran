@@ -493,6 +493,14 @@ class AdminController extends Controller
 
     public function ValidAtelier(Request $request)
     {
+        $request->validate([
+            'title_fr' => ['required', 'string'],
+            'title_en' => ['required', 'string'],
+            'start'    => ['required', 'date'],
+            'end'      => ['required', 'date', 'after_or_equal:start'],
+            'img'      => ['nullable', 'image', 'max:8192'],
+        ]);
+
         $name = ($request->hasFile('img'))
             ? $this->uploadImage($request->file('img'), '/frontend/assets/images/ateliers/', 850, 550)
             : null;
@@ -525,6 +533,14 @@ class AdminController extends Controller
 
     public function EditAtelierValid(Request $request)
     {
+        $request->validate([
+            'title_fr' => ['required', 'string'],
+            'title_en' => ['required', 'string'],
+            'start'    => ['required', 'date'],
+            'end'      => ['required', 'date', 'after_or_equal:start'],
+            'img'      => ['nullable', 'image', 'max:8192'],
+        ]);
+
         $name = ($request->hasFile('img'))
             ? $this->uploadImage($request->file('img'), '/frontend/assets/images/ateliers/', 850, 550)
             : ($request->img_up ?? null);
@@ -1603,15 +1619,18 @@ class AdminController extends Controller
     public function EditApropos(Request $request)
     {
         $request->validate([
-            'image_intro'   => ['nullable', 'image', 'max:8192'],
-            'image_mission' => ['nullable', 'image', 'max:8192'],
-            'image_mandat'  => ['nullable', 'image', 'max:8192'],
+            'image_intro'     => ['nullable', 'image', 'max:8192'],
+            'image_mission'   => ['nullable', 'image', 'max:8192'],
+            'image_mandat'    => ['nullable', 'image', 'max:8192'],
+            'image_objectif1' => ['nullable', 'image', 'max:8192'],
+            'image_objectif2' => ['nullable', 'image', 'max:8192'],
+            'image_objectif3' => ['nullable', 'image', 'max:8192'],
         ]);
 
         $apropos = Apropo::findOrFail($request->apropos_id);
 
         $images = [];
-        foreach (['image_intro', 'image_mission', 'image_mandat'] as $champ) {
+        foreach (['image_intro', 'image_mission', 'image_mandat', 'image_objectif1', 'image_objectif2', 'image_objectif3'] as $champ) {
             $images[$champ] = $request->hasFile($champ)
                 ? $this->uploadImage($request->file($champ), '/frontend/assets/images/resource/', 850, 550)
                 : $apropos->{$champ};
