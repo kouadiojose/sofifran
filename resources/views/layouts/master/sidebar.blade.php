@@ -12,11 +12,19 @@
           : '/frontend/assets/images/logo-white.png';
     @endphp
 
-    <!-- Brand Logo en haut de la sidebar -->
+    <!-- Brand Logo en haut de la sidebar : toujours sur fond blanc -->
 
-    <a href="{{ route('admin-dashboard') }}" class="brand-link text-center" @if($logoPerso) style="background: #ffffff; padding: 10px 8px;" @endif>
+    <a href="{{ route('admin-dashboard') }}" class="brand-link text-center"
+       style="background: #ffffff !important; padding: 10px 8px; border-bottom: 1px solid #dee2e6;">
 
-      <img src="{{ $sidebarLogo }}" alt="Logo Sofifran" style="max-height: 44px; width: auto;">
+      @if($logoPerso)
+        <img src="{{ $sidebarLogo }}" alt="Logo Sofifran"
+             style="max-height: 44px; width: auto; background: #ffffff; padding: 2px 8px; border-radius: 4px;">
+      @else
+        {{-- Pas de logo personnalise : le logo blanc embarque serait invisible
+             sur fond blanc, on affiche le nom en toutes lettres --}}
+        <span style="color: #b05329; font-weight: 700; font-size: 1.2rem; letter-spacing: 1px;">SOFIFRAN</span>
+      @endif
 
     </a>
 
