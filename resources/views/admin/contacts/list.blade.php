@@ -106,6 +106,8 @@
 
                           <th class="text-center">N°</th>
 
+                          <th class="text-center">Date</th>
+
                           <th class="text-center">Nom et Prenom(s)</th>
 
                           <th class="text-center">Email</th>
@@ -113,6 +115,8 @@
                           <th class="text-center">Phone</th>
 
                           <th class="text-center">Message</th>
+
+                          <th class="text-center">Action</th>
 
                         </tr>
 
@@ -129,10 +133,21 @@
                       <tr>
 
                         <td class="text-center">{{ $i++ }}</td>
-                        <td class="text-center">{{ $p->name }}</td> 
-                        <td class="text-center">{{ $p->email }}</td> 
-                        <td class="text-center">{{ $p->phone }}</td> 
-                        <td class="text-center">{{ $p->message }}</td> 
+                        <td class="text-center">{{ $p->created_at ? $p->created_at->format('d/m/Y H:i') : '-' }}</td>
+                        <td class="text-center">{{ $p->name }}</td>
+                        <td class="text-center"><a href="mailto:{{ $p->email }}">{{ $p->email }}</a></td>
+                        <td class="text-center">{{ $p->phone }}</td>
+                        <td>
+                          {{ \Illuminate\Support\Str::limit($p->message, 80) }}
+                          @if(mb_strlen($p->message) > 80)
+                            <a href="javascript:;" data-toggle="modal" data-target="#view_message"
+                               data-name="{{ $p->name }}" data-message="{{ $p->message }}">Lire tout</a>
+                          @endif
+                        </td>
+                        <td class="text-center" style="white-space: nowrap;">
+                          <a href="mailto:{{ $p->email }}?subject=Re: votre message à Sofifran" class="btn btn-info btn-sm" title="Répondre par email"><i class="fas fa-reply"></i></a>
+                          <a href="javascript:;" data-toggle="modal" data-target="#del_contact" data-id="{{ $p->id }}" class="btn btn-danger btn-sm" title="Supprimer"><i class="fas fa-trash"></i></a>
+                        </td>
 
                       </tr>
 
@@ -183,57 +198,50 @@
 
 
 
-    <div class="modal fade" id="del_project" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-
-      <div class="modal-dialog modal-dialog-centered" role="document">
-
+    <!-- Modal : lecture du message complet -->
+    <div class="modal fade" id="view_message" tabindex="-1" data-backdrop="static" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
-
           <div class="modal-header">
-
-            <h5 class="modal-title" id="exampleModalLongTitle">Suppression du projet</h5>
-
+            <h5 class="modal-title">Message de <span id="msg-name"></span></h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-
               <span aria-hidden="true">&times;</span>
-
             </button>
-
           </div>
-
-          <form action="{{ route('admin-projet-delete') }}" id="del" method="post">
-
-
-
-            {{ csrf_field() }}
-
-            <input type="hidden" name="del_id" id="id">
-
-            <div class="modal-body">
-
-              <p> Voulez-vous supprimer cet projet ? </p>
-
-            </div>
-
-            <div class="modal-footer">
-
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Non</button>
-
-              <button type="submit" id="del" class="btn btn-primary">Oui</button>
-
-            </div>
-
-          </form>
-
-
-
+          <div class="modal-body">
+            <p id="msg-body" style="white-space: pre-line;"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+          </div>
         </div>
-
       </div>
-
     </div>
 
-
+    <!-- Modal : suppression d'un message -->
+    <div class="modal fade" id="del_contact" tabindex="-1" data-backdrop="static" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Suppression du message</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <form action="{{ route('admin-contact-delete') }}" method="post">
+            {{ csrf_field() }}
+            <input type="hidden" name="del_id" id="id">
+            <div class="modal-body">
+              <p>Voulez-vous supprimer ce message de contact ?</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Non</button>
+              <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
 @endsection
 
@@ -305,21 +313,22 @@
 
 
 
-    $("#del_project").on('show.bs.modal', function(e){
+    $("#del_contact").on('show.bs.modal', function(e){
 
         var button = $(e.relatedTarget);
 
-        var id = button.data('id');
-
-        var modal = $(this);
-
-
-
-        modal.find('#id').val(id);
+        $(this).find('#id').val(button.data('id'));
 
     });
 
+    $("#view_message").on('show.bs.modal', function(e){
 
+        var button = $(e.relatedTarget);
+
+        $(this).find('#msg-name').text(button.data('name'));
+        $(this).find('#msg-body').text(button.data('message'));
+
+    });
 
   });
 

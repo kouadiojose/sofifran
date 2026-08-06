@@ -56,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
         // le header et le footer du site, en cache pour eviter une requete
         // par affichage de page.
         View::composer(
-            ['layouts.frontend.header', 'layouts.frontend.footer', 'layouts.master.sidebar'],
+            ['layouts.frontend.head', 'layouts.frontend.header', 'layouts.frontend.footer', 'layouts.master.sidebar'],
             function ($view) {
                 $setting = Cache::remember('site_settings', 3600, function () {
                     try {

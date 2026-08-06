@@ -78,7 +78,7 @@
 
                     <div class="image">
 
-                        <img src="/frontend/assets/images/projects/{{$p->image}}" alt="image">
+                        <img loading="lazy" src="/frontend/assets/images/projects/{{$p->image}}" alt="image">
 
                     </div>
 

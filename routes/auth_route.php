@@ -31,6 +31,7 @@ Route::prefix('admin-sofifran')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin-dashboard');
 
         Route::get('/nos-contacts', [AdminController::class, 'Noscontacts'])->name('admin-list-contacts');
+        Route::post('/nos-contacts/delete', [AdminController::class, 'DelContact'])->name('admin-contact-delete');
 
         Route::get('/statistiques', [AdminController::class, 'visites'])->name('admin-visites');
 

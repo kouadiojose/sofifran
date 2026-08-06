@@ -37,7 +37,7 @@
             <div class="col-lg-6 col-md-6 col-sm-6">
                 <div class="single-case-study-box">
                     <a href="{{ route('sous-activites', $p->slug) }}" class="case-study-link">
-                        <img src="/frontend/assets/images/activites/categories/{{ $p->image }}">
+                        <img loading="lazy" src="/frontend/assets/images/activites/categories/{{ $p->image }}">
                     </a>
                     <div class="case-study-info">
                         

@@ -54,7 +54,7 @@
                     </div>
 
                     <div class="client-info">
-                        <img src="/frontend/assets/images/temoignages/{{ $t->image }}" alt="{{ $t->name }}">
+                        <img loading="lazy" src="/frontend/assets/images/temoignages/{{ $t->image }}" alt="{{ $t->name }}">
                         <h3>{{ $t->name }}</h3>
                         <span>{{ app()->getLocale() == 'fr' ? 'Témoin': 'Witness' }}</span>
                     </div>

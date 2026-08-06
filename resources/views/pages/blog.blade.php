@@ -78,7 +78,7 @@
 
                     <div class="post-image">
 
-                        <a href="{{ route('detail-blog', $b->slug) }}"><img src="/frontend/assets/images/blog/{{$b->image}}" alt="image"></a>
+                        <a href="{{ route('detail-blog', $b->slug) }}"><img loading="lazy" src="/frontend/assets/images/blog/{{$b->image}}" alt="image"></a>
 
                         <div class="date"><i class="flaticon-calendar"></i> {{ date('d M Y', strtotime($b->created_at)) }}</div>
 

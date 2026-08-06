@@ -16,7 +16,11 @@
     ? [1 => 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
     : [1 => 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-  $UneLink = "https://sofifran.org/publication/infolettre";
+  // Lien du bouton "Je continue" du popup : configure dans l'admin
+  // (Popups d'annonce), avec repli sur la page Infolettres.
+  $UneLink = (isset($popup) && $popup && !empty($popup->link))
+      ? $popup->link
+      : route('infolettre');
 ?>
 
 
@@ -133,7 +137,7 @@
 
     <a href="<?= $UneLink; ?>" rel="noopener">
 
-      <img src="/frontend/assets/images/popups/{{ $popup->image }}" alt="Découvrez cette actualité">
+      <img loading="lazy" src="/frontend/assets/images/popups/{{ $popup->image }}" alt="Découvrez cette actualité">
 
     </a>
 
@@ -226,7 +230,7 @@
 
                     <div class="post-image">
 
-                        <a href="{{ route('detail-projets', $p->slug) }}"><img src="/frontend/assets/images/projects/{{ $p->image }}" alt="image"></a>
+                        <a href="{{ route('detail-projets', $p->slug) }}"><img loading="lazy" src="/frontend/assets/images/projects/{{ $p->image }}" alt="image"></a>
 
 
 
@@ -392,7 +396,7 @@
 
                         <div class="image">
 
-                            <img src="/frontend/assets/images/activites/categories/{{$act->image}}" alt="image">
+                            <img loading="lazy" src="/frontend/assets/images/activites/categories/{{$act->image}}" alt="image">
 
                         </div>
 
@@ -598,7 +602,7 @@
 
                 <div class="client-info">
 
-                    <img src="/frontend/assets/images/temoignages/{{$t->image}}" alt="image">
+                    <img loading="lazy" src="/frontend/assets/images/temoignages/{{$t->image}}" alt="image">
 
                     <h3>{{$t->name}}</h3>
 
@@ -644,7 +648,7 @@
 
                   <div class="post-image">
 
-                      <a href="{{ route('detail-blog', $p->slug) }}"><img src="/frontend/assets/images/blog/{{$p->image}}" alt="image"></a>
+                      <a href="{{ route('detail-blog', $p->slug) }}"><img loading="lazy" src="/frontend/assets/images/blog/{{$p->image}}" alt="image"></a>
 
 
 
@@ -710,7 +714,7 @@
 
                 <a href="#">
 
-                    <img src="/frontend/assets/images/partenaires/{{$p->image}}" alt="image">
+                    <img loading="lazy" src="/frontend/assets/images/partenaires/{{$p->image}}" alt="image">
 
                 </a>
 

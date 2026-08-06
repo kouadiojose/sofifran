@@ -30,7 +30,13 @@
         @yield('css')
 
         <title>Sofifran - @yield('title')</title>
-        <link rel="icon" type="image/png" href="https://sofifran.org/assets/images/logo_ico.jpg">
+        @php
+          // Favicon : logo configure dans Admin > General, sinon logo local.
+          $favicon = (!empty($setting?->logo) && file_exists(public_path('frontend/assets/images/' . $setting->logo)))
+              ? '/frontend/assets/images/' . $setting->logo
+              : '/frontend/assets/images/logo-white.png';
+        @endphp
+        <link rel="icon" type="image/png" href="{{ $favicon }}">
   </head>
   <body>
       <!-- Preloader 

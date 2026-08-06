@@ -64,9 +64,11 @@
                       <table class="table table-bordered" id="example1">
                           <thead>
                               <th>N°</th>
+                              <th>Statut</th>
                               <th>Image</th>
                               <th>Titre</th>
                               <th>Contenu</th>
+                              <th>Lien</th>
                               <th>Date de debut</th>
                               <th>Date de fin</th>
                               <th>Action</th>
@@ -80,15 +82,31 @@
                             @foreach( $popups as $p )
                             <tr>
                               <td>{{ $i++ }}</td>
+                              <td>
+                                  @if($p->statut == 'actif')
+                                    <span class="badge badge-success">Actif</span>
+                                  @elseif($p->statut == 'programme')
+                                    <span class="badge badge-warning">Programmé</span>
+                                  @else
+                                    <span class="badge badge-secondary">Expiré</span>
+                                  @endif
+                              </td>
                               <td><?php if ( isset($p->image) ): ?>
                                       <img width="50" src="/frontend/assets/images/popups/{{ $p->image }}">
                                   <?php endif ?></td>
                               <td>{{ $p->titre }}</td>
                               <td>
                                   <?php if ( isset($p->contenu) ): ?>
-                                      {{ $p->contenu }}
+                                      {{ \Illuminate\Support\Str::limit($p->contenu, 80) }}
                                   <?php endif ?>
-                                  
+
+                              </td>
+                              <td>
+                                  @if($p->link)
+                                    <a href="{{ $p->link }}" target="_blank" title="{{ $p->link }}"><i class="fas fa-external-link-alt"></i> Voir</a>
+                                  @else
+                                    <small class="text-muted">Infolettres (défaut)</small>
+                                  @endif
                               </td>
                               <td>{{ $p->start }}</td>
                               <td>{{ $p->end }}</td>

@@ -1076,31 +1076,65 @@ class AdminController extends Controller
             ->with('popups', $popups);
     }
 
+    /**
+     * Cibles proposees pour le lien "contenu complet" d'un popup :
+     * derniers articles de blog + pages cles du site.
+     */
+    private function popupLinkTargets(): array
+    {
+        $targets = [
+            'Pages du site' => [
+                route('infolettre')     => 'Infolettres (PDF)',
+                route('publication')    => 'Toutes les publications',
+                route('blog')           => 'Blogue - Actualités',
+                route('projets')        => 'Projets en cours',
+                route('activites')      => 'Activités',
+                route('atelier')        => 'Évènements à venir',
+                route('engagez-vous')   => 'Engagez-vous',
+                route('contact')        => 'Contact',
+            ],
+        ];
+
+        $blogs = Blog::latest()->take(10)->get();
+        if ($blogs->isNotEmpty()) {
+            $articles = [];
+            foreach ($blogs as $b) {
+                $articles[route('detail-blog', $b->slug)] = $b->title_fr;
+            }
+            $targets['Derniers articles du blogue'] = $articles;
+        }
+
+        return $targets;
+    }
+
     public function popupsCreate()
     {
-        return view('admin.popups.create');
+        return view('admin.popups.create')
+            ->with('linkTargets', $this->popupLinkTargets());
     }
 
     public function popupsCreateValide(Request $request)
     {
-        if ($request->hasFile('img')) {
-            $name = $this->uploadImage($request->file('img'), '/frontend/assets/images/popups/', 0, 0); // pas de resize
+        $request->validate([
+            'titre' => ['required', 'string'],
+            'start' => ['required', 'date'],
+            'end'   => ['required', 'date', 'after_or_equal:start'],
+            'link'  => ['nullable', 'string', 'max:500'],
+            'img'   => ['nullable', 'image', 'max:8192'],
+        ]);
 
-            Popup::create([
-                'image'   => $name,
-                'titre'   => $request->titre,
-                'contenu' => $request->contenu,
-                'start'   => $request->start,
-                'end'     => $request->end,
-            ]);
-        } else {
-            Popup::create([
-                'titre'   => $request->titre,
-                'contenu' => $request->contenu,
-                'start'   => $request->start,
-                'end'     => $request->end,
-            ]);
-        }
+        $name = $request->hasFile('img')
+            ? $this->uploadImage($request->file('img'), '/frontend/assets/images/popups/', 0, 0) // pas de resize
+            : null;
+
+        Popup::create([
+            'image'   => $name,
+            'titre'   => $request->titre,
+            'contenu' => $request->contenu,
+            'start'   => $request->start,
+            'end'     => $request->end,
+            'link'    => $request->link,
+        ]);
 
         $request->session()->flash('msg', 'Vous avez ajouté un popup avec succès!');
         return back();
@@ -1108,32 +1142,37 @@ class AdminController extends Controller
 
     public function popupsEdit($id)
     {
-        $popup = Popup::where('id', $id)->first();
+        $popup = Popup::findOrFail($id);
 
         return view('admin.popups.edit')
-            ->with('popup', $popup);
+            ->with('popup', $popup)
+            ->with('linkTargets', $this->popupLinkTargets());
     }
 
     public function popupsEditValide(Request $request)
     {
-        if ($request->hasFile('img')) {
-            $name = $this->uploadImage($request->file('img'), '/frontend/assets/images/popups/', 0, 0); // pas de resize
+        $request->validate([
+            'titre' => ['required', 'string'],
+            'start' => ['required', 'date'],
+            'end'   => ['required', 'date', 'after_or_equal:start'],
+            'link'  => ['nullable', 'string', 'max:500'],
+            'img'   => ['nullable', 'image', 'max:8192'],
+        ]);
 
-            Popup::where('id', $request->popup_id)->update([
-                'image'   => $name,
-                'titre'   => $request->titre,
-                'contenu' => $request->contenu,
-                'start'   => $request->start,
-                'end'     => $request->end,
-            ]);
-        } else {
-            Popup::where('id', $request->popup_id)->update([
-                'titre'   => $request->titre,
-                'contenu' => $request->contenu,
-                'start'   => $request->start,
-                'end'     => $request->end,
-            ]);
-        }
+        $popup = Popup::findOrFail($request->popup_id);
+
+        $name = $request->hasFile('img')
+            ? $this->uploadImage($request->file('img'), '/frontend/assets/images/popups/', 0, 0) // pas de resize
+            : $popup->image;
+
+        $popup->update([
+            'image'   => $name,
+            'titre'   => $request->titre,
+            'contenu' => $request->contenu,
+            'start'   => $request->start,
+            'end'     => $request->end,
+            'link'    => $request->link,
+        ]);
 
         $request->session()->flash('msg', 'Vous avez modifié un popup avec succès!');
         return back();
@@ -1381,9 +1420,11 @@ class AdminController extends Controller
     /** USERS **/
     public function users()
     {
+        // leftJoin : un admin au role supprime/invalide doit rester visible
+        // dans la liste (l'inner join le faisait disparaitre).
         $users = DB::table('admins')
-            ->join('roles', 'roles.id', '=', 'admins.role_id')
-            ->select('admins.*', 'roles.name as role_name')
+            ->leftJoin('roles', 'roles.id', '=', 'admins.role_id')
+            ->select('admins.*', DB::raw("COALESCE(roles.name, 'Aucun rôle') as role_name"))
             ->get();
 
         $roles = Role::latest()->get();
@@ -1399,8 +1440,8 @@ class AdminController extends Controller
         $user  = Admin::where('id', $id)->first();
 
         $users = DB::table('admins')
-            ->join('roles', 'roles.id', '=', 'admins.role_id')
-            ->select('admins.*', 'roles.name as role_name')
+            ->leftJoin('roles', 'roles.id', '=', 'admins.role_id')
+            ->select('admins.*', DB::raw("COALESCE(roles.name, 'Aucun rôle') as role_name"))
             ->get();
 
         return view('admin.users.edit_user')
@@ -1636,6 +1677,7 @@ class AdminController extends Controller
             'post_en'     => $request->fonction_en,
             'post_fr'     => $request->fonction_fr,
             'type_membre' => $request->type_membre,
+            'ordre'       => (int) ($request->ordre ?? 0),
             'facebook'    => $request->facebook,
             'instagram'   => $request->instagram,
         ]);
@@ -1664,6 +1706,7 @@ class AdminController extends Controller
             'post_en'     => $request->fonction_en,
             'post_fr'     => $request->fonction_fr,
             'type_membre' => $request->type_membre,
+            'ordre'       => (int) ($request->ordre ?? 0),
             'facebook'    => $request->facebook,
             'instagram'   => $request->instagram,
         ]);
@@ -1808,6 +1851,13 @@ class AdminController extends Controller
 
         return view('admin.contacts.list')
             ->with('contacts', $contacts);
+    }
+
+    public function DelContact(Request $request)
+    {
+        Contact::findOrFail($request->del_id)->delete();
+        $request->session()->flash('msg', 'Message supprimé avec succès!');
+        return back();
     }
 
     /** --------------------------------
