@@ -849,18 +849,28 @@ class AdminController extends Controller
     }
     /** FIN BLOG/ACTUALITES **/
 
-    /** GALERIE **/
+    /** GALERIE (organisee en albums : 1 activite = 1 album) **/
     public function galerie()
     {
-        $galerie = Galerie_photo::join('activites', 'activites.id', '=', 'galerie_photos.galerie_id')
-            ->select('galerie_photos.*', 'activites.title_fr as titre', 'activites.image as img_activite')
+        $albums = Activite::withCount('photos')
+            ->orderBy('id', 'DESC')
             ->get();
 
-        $headerActivite = DB::table('entete_activites')->first();
+        $totalPhotos = Galerie_photo::count();
 
         return view('admin.galeries.list')
-            ->with('headerActivite', $headerActivite)
-            ->with('galerie', $galerie);
+            ->with('totalPhotos', $totalPhotos)
+            ->with('albums', $albums);
+    }
+
+    public function galerieAlbum($id)
+    {
+        $album  = Activite::withCount('photos')->findOrFail($id);
+        $photos = Galerie_photo::where('galerie_id', $id)->orderBy('id', 'DESC')->get();
+
+        return view('admin.galeries.album')
+            ->with('album', $album)
+            ->with('photos', $photos);
     }
 
     public function CreateGalerie()
@@ -873,18 +883,24 @@ class AdminController extends Controller
 
     public function ValidGalerie(Request $request)
     {
-        if ($request->hasFile('photos')) {
-            foreach ($request->file('photos') as $photo) {
-                $name = $this->uploadImage($photo, '/frontend/assets/images/gallery/photos/', 850, 550);
+        $request->validate([
+            'activite'  => ['required', 'integer', 'exists:activites,id'],
+            'photos'    => ['required', 'array'],
+            'photos.*'  => ['image', 'max:8192'],
+        ]);
 
-                Galerie_photo::create([
-                    'image'      => $name,
-                    'galerie_id' => $request->activite,
-                ]);
-            }
+        $count = 0;
+        foreach ($request->file('photos') as $photo) {
+            $name = $this->uploadImage($photo, '/frontend/assets/images/gallery/photos/', 850, 550);
+
+            Galerie_photo::create([
+                'image'      => $name,
+                'galerie_id' => $request->activite,
+            ]);
+            $count++;
         }
 
-        $request->session()->flash('msg', 'Vous avez ajouté des photos de galerie avec succès!');
+        $request->session()->flash('msg', $count . ' photo(s) ajoutée(s) à l\'album avec succès!');
         return back();
     }
 

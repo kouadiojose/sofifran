@@ -1,271 +1,100 @@
 @extends('layouts.admin')
 
-
-
-@section('title', 'galeries')
-
+@section('title', 'Galerie photos')
 @section('link', 'galerie')
-
-
-
-@section('style')
-
-    <!-- DataTables -->
-
-  <link rel="stylesheet" href="/admin/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-
-  <link rel="stylesheet" href="/admin/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-
-  <link rel="stylesheet" href="/admin/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-
-
-
-@endsection
-
-
 
 @section('content')
 
-
-
-<!-- Content Header (Page header) -->
-
+    <!-- Content Header (Page header) -->
     <div class="content-header">
-
       <div class="container-fluid">
-
         <div class="row mb-2">
-
           <div class="col-sm-6">
-
-            <h1 class="m-0 text-dark">Nos galeries</h1>
-
-          </div><!-- /.col -->
-
+            <h1 class="m-0 text-dark">Galerie photos <small class="text-muted">— {{ $totalPhotos }} photo(s) dans {{ $albums->count() }} album(s)</small></h1>
+          </div>
           <div class="col-sm-6">
-
             <ol class="breadcrumb float-sm-right">
-
               <li class="breadcrumb-item"><a href="{{ route('admin-dashboard') }}">Tableau de Bord</a></li>
-
-              <li class="breadcrumb-item active">Galeries</li>
-
+              <li class="breadcrumb-item active">Galerie photos</li>
             </ol>
-
-          </div><!-- /.col -->
-
-        </div><!-- /.row -->
-
-      </div><!-- /.container-fluid -->
+          </div>
+        </div>
+      </div>
     </div>
-
     <!-- /.content-header -->
 
-
-
     <!-- Main content -->
-
     <section class="content">
-
       <div class="container-fluid">
 
-        <!-- Info boxes -->
-
         <div class="row">
-
           @if( session()->has('msg') )
-
           <div class="col-md-12">
-
             <div class="alert alert-success">{{ session()->get('msg') }}</div>
-
           </div>
-
           @endif
 
-
-          <div class="col-md-12">
-
+          <div class="col-md-12 mb-3">
             <div class="card">
-
-              <div class="card-header">
-
-                <h2 class="card-title">Liste de nos galeries</h2>
-
-                <a href="{{ route('admin-galerie-create') }}" class="btn btn-primary float-right"> <i class="fa fa-plus"></i> Créer un nouveau</a>
-
+              <div class="card-body py-2 d-flex align-items-center justify-content-between flex-wrap">
+                <div class="flex-grow-1 mr-3" style="max-width: 420px;">
+                  <input type="text" id="album-search" class="form-control" placeholder="🔍 Rechercher un album...">
+                </div>
+                <div>
+                  <a href="{{ route('admin-galerie-create') }}" class="btn btn-primary"><i class="fa fa-plus"></i> Ajouter des photos</a>
+                </div>
               </div>
-
-              <!-- /.card-header -->
-
-              <div class="card-body">
-
-                  @include('admin.galeries.master._table')
-
-              </div>
-
             </div>
-
           </div>
-
-          <!-- /.col -->
-
         </div>
 
-        <!-- /.row -->
+        <div class="row" id="albums-grid">
 
+          @forelse($albums as $a)
+          <div class="col-lg-3 col-md-4 col-sm-6 album-card" data-title="{{ mb_strtolower($a->title_fr) }}">
+            <div class="card">
+              <a href="{{ route('admin-galerie-album', $a->id) }}">
+                <img src="/frontend/assets/images/activites/{{ $a->image }}" class="card-img-top" alt="{{ $a->title_fr }}" style="height: 160px; object-fit: cover;">
+              </a>
+              <div class="card-body p-3">
+                <h3 class="card-title d-block mb-2" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;" title="{{ $a->title_fr }}">
+                  {{ $a->title_fr }}
+                </h3>
+                <div class="d-flex align-items-center justify-content-between">
+                  <span class="badge {{ $a->photos_count > 0 ? 'badge-info' : 'badge-secondary' }}">
+                    <i class="far fa-images"></i> {{ $a->photos_count }} photo(s)
+                  </span>
+                  <a href="{{ route('admin-galerie-album', $a->id) }}" class="btn btn-sm btn-outline-primary">
+                    Ouvrir l'album <i class="fas fa-arrow-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          @empty
+          <div class="col-12">
+            <div class="alert alert-info">
+              Aucune activité pour le moment. Les albums photos sont rattachés aux activités : créez d'abord une activité, puis ajoutez-y des photos.
+            </div>
+          </div>
+          @endforelse
 
+        </div>
 
       </div><!--/. container-fluid -->
-
     </section>
-
     <!-- /.content -->
-
-
-
-    <div class="modal fade" id="del_galerie" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-
-      <div class="modal-dialog modal-dialog-centered" role="document">
-
-        <div class="modal-content">
-
-          <div class="modal-header">
-
-            <h5 class="modal-title" id="exampleModalLongTitle">Suppression de la galerie</h5>
-
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-
-              <span aria-hidden="true">&times;</span>
-
-            </button>
-
-          </div>
-
-          <form action="{{ route('admin-galerie-delete') }}" id="del" method="post">
-
-
-
-            {{ csrf_field() }}
-
-            <input type="hidden" name="del_id" id="id">
-
-            <div class="modal-body">
-
-              <p> Voulez-vous supprimer cette galerie ? </p>
-
-            </div>
-
-            <div class="modal-footer">
-
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Non</button>
-
-              <button type="submit" id="del" class="btn btn-primary">Oui</button>
-
-            </div>
-
-          </form>
-
-
-
-        </div>
-
-      </div>
-
-    </div>
-
-
 
 @endsection
 
-
-
 @section('js')
-
-<!-- DataTables  & Plugins -->
-
-<script src="/admin/plugins/datatables/jquery.dataTables.min.js"></script>
-
-<script src="/admin/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-
-<script src="/admin/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-
-<script src="/admin/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-
-<script src="/admin/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-
-<script src="/admin/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-
-<script src="/admin/plugins/jszip/jszip.min.js"></script>
-
-<script src="/admin/plugins/pdfmake/pdfmake.min.js"></script>
-
-<script src="/admin/plugins/pdfmake/vfs_fonts.js"></script>
-
-<script src="/admin/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-
-<script src="/admin/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-
-<script src="/admin/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-
-
-
 <script>
-
-
-
-  $(function () {
-
-
-
-    $("#example1").DataTable({
-
-      "responsive": true, "lengthChange": false, "autoWidth": false,
-
-      "buttons": ["copy", "excel"]
-
-    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-
-    $('#example2').DataTable({
-
-      "paging": true,
-
-      "lengthChange": false,
-
-      "searching": false,
-
-      "ordering": true,
-
-      "info": true,
-
-      "autoWidth": false,
-
-      "responsive": true,
-
+  // Filtre instantane des albums par titre.
+  document.getElementById('album-search').addEventListener('input', function () {
+    var q = this.value.toLowerCase().trim();
+    document.querySelectorAll('#albums-grid .album-card').forEach(function (card) {
+      card.style.display = card.dataset.title.indexOf(q) !== -1 ? '' : 'none';
     });
-
-
-
-    $("#del_galerie").on('show.bs.modal', function(e){
-
-        var button = $(e.relatedTarget);
-
-        var id = button.data('id');
-
-        var modal = $(this);
-
-
-
-        modal.find('#id').val(id);
-
-    });
-
-
-
   });
-
 </script>
-
-
-
 @endsection
