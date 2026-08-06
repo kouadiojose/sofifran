@@ -12733,3 +12733,16 @@ Go Top CSS
         object-fit: cover;
 
     }
+/* === Ajustements Sofifran : menu principal ===
+   Empeche la fleche des menus deroulants de passer sous le libelle,
+   et resserre legerement le menu pour tenir sur une ligne. */
+.pearo-nav .navbar .navbar-nav .nav-item a {
+  white-space: nowrap;
+}
+@media (min-width: 992px) and (max-width: 1599px) {
+  .pearo-nav .navbar .navbar-nav .nav-item a {
+    font-size: 13.5px;
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+}

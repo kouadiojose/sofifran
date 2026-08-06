@@ -3,23 +3,20 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
 
     @php
-      // Logo gere dans Admin > General (settings.logo), avec repli sur le
-      // logo blanc embarque si le fichier configure est absent.
-      $sidebarLogo = '/frontend/assets/images/logo-white.png';
-      if (!empty($setting?->logo) && file_exists(public_path('frontend/assets/images/' . $setting->logo))) {
-          $sidebarLogo = '/frontend/assets/images/' . $setting->logo;
-      }
+      // Logo gere dans Admin > General (settings.logo). Avec un logo
+      // personnalise (couleur) : fond blanc. Sans logo configure : repli sur
+      // le logo blanc embarque, sur fond sombre (sinon il serait invisible).
+      $logoPerso   = !empty($setting?->logo) && file_exists(public_path('frontend/assets/images/' . $setting->logo));
+      $sidebarLogo = $logoPerso
+          ? '/frontend/assets/images/' . $setting->logo
+          : '/frontend/assets/images/logo-white.png';
     @endphp
 
-    <!-- Brand Logo -->
+    <!-- Brand Logo en haut de la sidebar -->
 
-    <a href="{{ route('admin-dashboard') }}" class="brand-link text-center">
+    <a href="{{ route('admin-dashboard') }}" class="brand-link text-center" @if($logoPerso) style="background: #ffffff; padding: 10px 8px;" @endif>
 
-      <img src="{{ $sidebarLogo }}" alt="Logo Sofifran" class="brand-image"
-
-           style="opacity: .9; max-height: 33px; width: auto; float: none;">
-
-      <span class="brand-text font-weight-light">Admin Sofifran</span>
+      <img src="{{ $sidebarLogo }}" alt="Logo Sofifran" style="max-height: 44px; width: auto;">
 
     </a>
 
@@ -29,21 +26,11 @@
 
     <div class="sidebar">
 
-      <!-- Sidebar user panel -->
+      <!-- Sous le logo : simple mention Admin -->
 
-      <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
+      <div class="user-panel mt-3 pb-3 mb-3 text-center">
 
-        <div class="image">
-
-          <img src="{{ $sidebarLogo }}" class="elevation-2" alt="Logo Sofifran" style="max-height: 34px; width: auto; border-radius: 4px; background: rgba(255,255,255,.9); padding: 2px;">
-
-        </div>
-
-        <div class="info">
-
-          <a href="{{ route('admin-dashboard') }}" class="d-block">{{ auth('admin')->user()->name ?? 'Sofifran' }}</a>
-
-        </div>
+        <a href="{{ route('admin-dashboard') }}" class="d-block" style="color: #c2c7d0; font-weight: 600; letter-spacing: 3px;">ADMIN</a>
 
       </div>
 
