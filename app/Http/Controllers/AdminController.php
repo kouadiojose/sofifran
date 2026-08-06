@@ -34,6 +34,7 @@ use App\Models\Sous_activite;
 use App\Models\Team;
 use App\Models\Temoignage;
 use App\Models\User;
+use App\Models\Visite;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
@@ -126,7 +127,19 @@ class AdminController extends Controller
 
         $derniersContacts = Contact::latest()->take(5)->get();
 
+        // Statistiques de visites (0 tant que la migration n'est pas lancee).
+        $visitesAujourdhui = 0;
+        $visites30j        = 0;
+        try {
+            $visitesAujourdhui = Visite::whereDate('created_at', now()->format('Y-m-d'))->count();
+            $visites30j        = Visite::where('created_at', '>=', now()->subDays(29)->startOfDay())->count();
+        } catch (\Throwable $e) {
+            // table visites absente
+        }
+
         return view('admin.dashboard')
+            ->with('visitesAujourdhui', $visitesAujourdhui)
+            ->with('visites30j', $visites30j)
             ->with('countPorjetEnd', $countPorjetEnd)
             ->with('countPorjetCours', $countPorjetCours)
             ->with('countActivite', $countActivite)
@@ -1795,6 +1808,76 @@ class AdminController extends Controller
 
         return view('admin.contacts.list')
             ->with('contacts', $contacts);
+    }
+
+    /** --------------------------------
+     *     STATISTIQUES DE VISITES
+     * --------------------------------*/
+    public function visites()
+    {
+        $today   = now()->format('Y-m-d');
+        $depuis  = now()->subDays(29)->startOfDay();
+
+        // Compteurs globaux
+        $visitesAujourdhui   = Visite::whereDate('created_at', $today)->count();
+        $visiteursAujourdhui = Visite::whereDate('created_at', $today)->distinct('visitor_hash')->count('visitor_hash');
+        $visites30j          = Visite::where('created_at', '>=', $depuis)->count();
+        $visiteurs30j        = Visite::where('created_at', '>=', $depuis)->distinct('visitor_hash')->count('visitor_hash');
+        $visitesTotal        = Visite::count();
+
+        // Evolution jour par jour sur 30 jours (jours sans visite = 0)
+        $parJour = Visite::where('created_at', '>=', $depuis)
+            ->selectRaw('DATE(created_at) as jour, COUNT(*) as total')
+            ->groupBy('jour')
+            ->pluck('total', 'jour');
+
+        $chartLabels = [];
+        $chartData   = [];
+        for ($i = 29; $i >= 0; $i--) {
+            $d = now()->subDays($i)->format('Y-m-d');
+            $chartLabels[] = now()->subDays($i)->format('d/m');
+            $chartData[]   = (int) ($parJour[$d] ?? 0);
+        }
+
+        // Pages les plus visitees (30 jours)
+        $topPages = Visite::where('created_at', '>=', $depuis)
+            ->selectRaw('page, COUNT(*) as total')
+            ->groupBy('page')
+            ->orderByDesc('total')
+            ->limit(10)
+            ->get();
+
+        // Sources de trafic (30 jours) : referents externes + acces directs
+        $sources = Visite::where('created_at', '>=', $depuis)
+            ->whereNotNull('referer_host')
+            ->selectRaw('referer_host, COUNT(*) as total')
+            ->groupBy('referer_host')
+            ->orderByDesc('total')
+            ->limit(10)
+            ->get();
+
+        $accesDirects = Visite::where('created_at', '>=', $depuis)
+            ->whereNull('referer_host')
+            ->count();
+
+        // Appareils et navigateurs (30 jours)
+        $appareils = Visite::where('created_at', '>=', $depuis)
+            ->selectRaw('device, COUNT(*) as total')
+            ->groupBy('device')
+            ->orderByDesc('total')
+            ->get();
+
+        $navigateurs = Visite::where('created_at', '>=', $depuis)
+            ->selectRaw('browser, COUNT(*) as total')
+            ->groupBy('browser')
+            ->orderByDesc('total')
+            ->limit(8)
+            ->get();
+
+        return view('admin.visites.index', compact(
+            'visitesAujourdhui', 'visiteursAujourdhui', 'visites30j', 'visiteurs30j', 'visitesTotal',
+            'chartLabels', 'chartData', 'topPages', 'sources', 'accesDirects', 'appareils', 'navigateurs'
+        ));
     }
 
 }

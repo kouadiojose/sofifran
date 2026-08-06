@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\Localization;
+use App\Http\Middleware\TrackVisit;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,7 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         //
         $middleware->web(append: [
-            Localization::class
+            Localization::class,
+            TrackVisit::class,
         ]);
 
         // Les invités de la zone admin sont renvoyés vers le login admin,

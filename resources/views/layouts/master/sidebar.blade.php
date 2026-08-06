@@ -77,6 +77,22 @@
 
           </li>
 
+          <li class="nav-item">
+
+            <a href="{{ route('admin-visites') }}" class="nav-link" id="Li_visites">
+
+              <i class="nav-icon fas fa-chart-line"></i>
+
+              <p>
+
+                Statistiques de visites
+
+              </p>
+
+            </a>
+
+          </li>
+
 
 
          

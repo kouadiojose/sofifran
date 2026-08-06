@@ -32,6 +32,8 @@ Route::prefix('admin-sofifran')->group(function () {
 
         Route::get('/nos-contacts', [AdminController::class, 'Noscontacts'])->name('admin-list-contacts');
 
+        Route::get('/statistiques', [AdminController::class, 'visites'])->name('admin-visites');
+
         /*** Equipe ***/
         Route::get('/team', [AdminController::class, 'team'])->name('admin-equipe');
         Route::get('/team/create', [AdminController::class, 'teamCreate'])->name('admin-equipe-create');
