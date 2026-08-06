@@ -34,14 +34,6 @@
     <div class="container">
         <div class="row">
 
-            <div class="col-lg-4 col-md-6 col-sm-6">
-                    <div class="case-study-details-image">
-                        <div class="image">
-                            <img src="/frontend/assets/images/gallery/video/test_video.png" alt="projects">
-                            <a href="https://vimeo.com/1142140259" class="popup-youtube"><i class="flaticon-play-button"></i></a>
-                        </div>
-                    </div>
-                </div>
             @foreach($videos as $v)
                
                 <div class="col-lg-4 col-md-6 col-sm-6">
@@ -55,6 +47,9 @@
                 </div>
             @endforeach
 
+            <div class="col-lg-12 col-md-12 d-flex justify-content-center">
+                {{ $videos->links() }}
+            </div>
 
         </div>
     </div>

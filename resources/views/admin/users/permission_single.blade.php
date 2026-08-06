@@ -113,32 +113,6 @@
     </section>
     <!-- /.content -->
 
-  <div class="modal fade" id="del_project" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">Suppression du users</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <form action="#" id="del" method="post">
-
-            {{ csrf_field() }}
-            <input type="hidden" name="del_id" id="id">
-            <div class="modal-body">
-              <p> Voulez-vous supprimer cet projet ? </p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Non</button>
-              <button type="submit" id="del" class="btn btn-primary">Oui</button>
-            </div>
-          </form>
-
-        </div>
-      </div>
-  </div>
-
   <div class="modal fade" id="change_password" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -188,14 +162,6 @@
 
   $(function () {
 
-    $("#del_project").on('show.bs.modal', function(e){
-        var button = $(e.relatedTarget);
-        var id = button.data('id');
-        var modal = $(this);
-
-        modal.find('#id').val(id);
-    });
-
     $("#change_password").on('show.bs.modal', function(e){
         var button = $(e.relatedTarget);
         var id = button.data('id');
@@ -225,7 +191,7 @@
 
             
 
-            $.get("https://pointancragejeunesse.org/adminpaj/permission_per_role/"+role_id, function(data, status){
+            $.get("{{ url("admin-sofifran/permission_per_role") }}/"+role_id, function(data, status){
 
                 $("input[type='checkbox'] ").removeAttr("checked");
                 list = JSON.parse(data);

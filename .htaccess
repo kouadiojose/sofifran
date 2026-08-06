@@ -52,27 +52,20 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 
 
-<FilesMatch "\.(css|js|jpg|jpeg|png|gif|svg|woff|woff2|ttf|eot)$">
-
-    Header set Cache-Control "no-cache, no-store, must-revalidate"
-
-    Header set Pragma "no-cache"
-
-    Header set Expires 0
-
-</FilesMatch>
-
-
-
 <IfModule mod_headers.c>
 
-    # Désactive la mise en cache
+    # Assets statiques : caches 30 jours par le navigateur (le nom de fichier
+    # des uploads change a chaque televersement, pas de risque de contenu perime)
+    <FilesMatch "\.(css|js|jpg|jpeg|png|gif|webp|svg|woff|woff2|ttf|eot|mp4)$">
+        Header set Cache-Control "public, max-age=2592000"
+        Header unset Pragma
+        Header unset Expires
+    </FilesMatch>
 
-    Header always set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
-
-    Header always set Pragma "no-cache"
-
-    Header always set Expires "Thu, 01 Jan 1970 00:00:00 GMT"
+    # Pages HTML : toujours revalidees (contenu dynamique)
+    <FilesMatch "\.(html|php)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
 
 </IfModule>
 

@@ -92,7 +92,7 @@
 
                         <div class="content">
 
-                            <h3><a href="#">{{ app()->getLocale() == 'fr' ? $p->title_fr : $p->title_en }}</a></h3>
+                            <h3><a href="{{ route('galerie-photo-get', $p->slug) }}">{{ app()->getLocale() == 'fr' ? $p->title_fr : $p->title_en }}</a></h3>
 
 
 

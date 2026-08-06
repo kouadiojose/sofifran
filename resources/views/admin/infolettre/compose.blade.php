@@ -89,14 +89,11 @@
                     <option value="groupe">Email Groupé</option>
                   </select>
                 </div>
-                <div class="form-group" id="chp_individuel_default">
-                  <input class="form-control" type="text" required="required" name="to" placeholder="A:">
-                </div>
-                <div class="form-group" id="chp_individuel" style="display: none;">
-                  <input class="form-control" type="text" required="required" name="to" placeholder="A:">
+                <div class="form-group" id="chp_individuel">
+                  <input class="form-control" type="email" name="to" placeholder="A: adresse@email.com">
                 </div>
                 <div class="form-group" id="chp_groupe" style="display: none;">
-                  <select class="select2 form-control" required="required" multiple="multiple" data-placeholder="Selectionner au moins un email" name="mailgroupe[]" style="width: 100%;">
+                  <select class="select2 form-control" multiple="multiple" data-placeholder="Selectionner au moins un email" name="mailgroupe[]" style="width: 100%;">
                     @foreach( $infolettre as $i )
                     <option value="{{ $i->email }}">{{ $i->email }}</option>
                     @endforeach

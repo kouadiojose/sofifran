@@ -296,7 +296,7 @@
 
                                 <i class="flaticon-home-insurance"></i>
 
-                                <h3><span class="odometer" data-count="83">00</span>+</h3>
+                                <h3><span class="odometer" data-count="{{ $nbProjets }}">00</span>+</h3>
 
                                 <p>Projets</p>
 
@@ -328,7 +328,7 @@
 
                                 <i class="flaticon-group"></i>
 
-                                <h3><span class="odometer" data-count="38">00</span>+</h3>
+                                <h3><span class="odometer" data-count="{{ $nbPartenaires }}">00</span>+</h3>
 
                                 <p>Partenaires</p>
 
@@ -344,7 +344,7 @@
 
                                 <i class="flaticon-medal"></i>
 
-                                <h3><span class="odometer" data-count="100">00</span>+</h3>
+                                <h3><span class="odometer" data-count="{{ $nbBlogs }}">00</span>+</h3>
 
                                 <p>Blogues</p>
 
@@ -408,7 +408,7 @@
 
                             <p style="text-align: justify;">
 
-                                <?= app()->getLocale() == 'fr' ? substr($act->description_fr, 0, 160): substr($act->description_fr, 0, 160); ?>...
+                                <?= app()->getLocale() == 'fr' ? substr($act->description_fr, 0, 160): substr($act->description_en, 0, 160); ?>...
 
                             </p>
 
@@ -464,7 +464,7 @@
 
                 $dateEnd = new DateTime($a->end);
 
-                $heure = new DateTime($a->hour_start);
+                $heure = $a->hour_start ? new DateTime($a->hour_start) : null;
 
             @endphp
 
@@ -514,7 +514,7 @@
 
                                         <h3>{{ $mois_noms[(int) $date->format('n')] }} {{ $date->format('Y') }}</h3>
 
-                                        <p>{{ $heure->format('H') }}H</p>
+                                        @if($heure)<p>{{ $heure->format('H') }}H</p>@endif
 
 
 
@@ -767,7 +767,7 @@
 
       const closeBtn = modal?.querySelector('.ad-close');
 
-      const continueBtn = modal?.querySelector('.ad-continue');
+      const continueBtn = modal?.querySelector('.ad-cta');
 
     
 

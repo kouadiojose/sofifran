@@ -285,17 +285,7 @@
         ]
     });
 
-    // Subscribe form
-    $(".newsletter-form").validator().on("submit", function (event) {
-        if (event.isDefaultPrevented()) {
-        // handle the invalid form...
-            formErrorSub();
-            submitMSGSub(false, "Please enter your email correctly.");
-        } else {
-            // everything looks good!
-            event.preventDefault();
-        }
-    });
+    // Subscribe form : soumission classique vers Laravel (interception du theme retiree)
     function callbackFunction (resp) {
         if (resp.result === "success") {
             formSuccessSub();
@@ -325,11 +315,7 @@
         }
         $("#validator-newsletter").removeClass().addClass(msgClasses).text(msg);
     }
-    // AJAX MailChimp
-    $(".newsletter-form").ajaxChimp({
-        url: "https://envytheme.us20.list-manage.com/subscribe/post?u=60e1ffe2e8a68ce1204cd39a5&amp;id=42d6d188d9", // Your url MailChimp
-        callback: callbackFunction
-    });
+    // (envoi MailChimp du theme retire : les inscriptions passent par le backend Laravel)
 
     // Achievements Image Slides
     $('.achievements-image-slides').owlCarousel({
@@ -436,11 +422,12 @@ function toggleTheme() {
 }
 // Immediately invoked function to set the theme on initial load
 (function () {
+	var slider = document.getElementById('slider');
 	if (localStorage.getItem('theme') === 'theme-dark') {
 		setTheme('theme-dark');
-		document.getElementById('slider').checked = false;
+		if (slider) slider.checked = false;
 	} else {
 		setTheme('theme-light');
-	  document.getElementById('slider').checked = true;
+		if (slider) slider.checked = true;
 	}
 })();

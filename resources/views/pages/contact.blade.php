@@ -66,7 +66,24 @@
 
                     <div class="contact-form">
 
-                        <form id="contactForm">
+                        @if(session('msg_success'))
+                          <div class="alert alert-success">{{ session('msg_success') }}</div>
+                        @endif
+                        @if(session('message_error'))
+                          <div class="alert alert-danger">{{ session('message_error') }}</div>
+                        @endif
+                        @if ($errors->any())
+                          <div class="alert alert-danger">
+                            <ul class="mb-0">
+                              @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                              @endforeach
+                            </ul>
+                          </div>
+                        @endif
+
+                        <form id="contactForm" action="{{ route('contact-send-mail') }}" method="post">
+                            @csrf
 
                             <div class="row">
 
@@ -74,7 +91,7 @@
 
                                     <div class="form-group">
 
-                                        <input type="text" name="name" id="name" class="form-control" required data-error="Please enter your name" placeholder="{{ app()->getLocale() == 'fr' ? 'Nom Et Prénom(s)' : 'Full Name' }}">
+                                        <input type="text" name="form_name" id="name" value="{{ old('form_name') }}" class="form-control" required data-error="Please enter your name" placeholder="{{ app()->getLocale() == 'fr' ? 'Nom Et Prénom(s)' : 'Full Name' }}">
 
                                         <div class="help-block with-errors"></div>
 
@@ -88,7 +105,7 @@
 
                                     <div class="form-group">
 
-                                        <input type="email" name="email" id="email" class="form-control" required data-error="Please enter your email" placeholder="{{ app()->getLocale() == 'fr' ? 'Email' : 'Email' }}">
+                                        <input type="email" name="email" id="email" value="{{ old('email') }}" class="form-control" required data-error="Please enter your email" placeholder="{{ app()->getLocale() == 'fr' ? 'Email' : 'Email' }}">
 
                                         <div class="help-block with-errors"></div>
 
@@ -102,7 +119,7 @@
 
                                     <div class="form-group">
 
-                                        <input type="text" name="phone_number" id="phone_number" required data-error="Please enter your number" class="form-control" placeholder="{{ app()->getLocale() == 'fr' ? 'Téléphone' : 'Phone' }}">
+                                        <input type="text" name="form_phone" id="phone_number" value="{{ old('form_phone') }}" required data-error="Please enter your number" class="form-control" placeholder="{{ app()->getLocale() == 'fr' ? 'Téléphone' : 'Phone' }}">
 
                                         <div class="help-block with-errors"></div>
 
@@ -116,7 +133,7 @@
 
                                     <div class="form-group">
 
-                                        <textarea name="message" class="form-control" id="message" cols="30" rows="6" required data-error="Write your message" placeholder="{{ app()->getLocale() == 'fr' ? 'Votre message' : 'Your message' }}"></textarea>
+                                        <textarea name="form_message" class="form-control" id="message" cols="30" rows="6" required data-error="Write your message" placeholder="{{ app()->getLocale() == 'fr' ? 'Votre message' : 'Your message' }}"></textarea>
 
                                         <div class="help-block with-errors"></div>
 
@@ -197,7 +214,7 @@
 
                         <li><a href="{{ $setting->linkedln ?? '#' }}" target="_blank"><i class="fi fi-brands-linkedin"></i></a></li>
 
-                        <li><a href="#" target="_blank"><i class="fi fi-brands-instagram"></i></a></li>
+                        <li><a href="{{ $setting->instagram ?? '#' }}" target="_blank"><i class="fi fi-brands-instagram"></i></a></li>
 
                     </ul>
 
@@ -209,7 +226,7 @@
 
         
 
-        <div class="bg-map"><img src="assets/img/bg-map.png" alt="image"></div>
+        <div class="bg-map"></div>
 
     </section>
 

@@ -15,16 +15,7 @@
     <?php $i = 1; ?>
     @foreach( $post as $p )
 
-    <?php 
-        $don = DB::table('donates')->where('projet_id', $p->id)
-        ->get();
-        $total = 0;
-
-        foreach ($don as $key => $value) {
-          # code...
-          $total = $total + $value->gains;
-        }
-     ?>
+    
     <tr>
       <td class="text-center">{{ $i++ }}</td>
       <td class="text-center"><img src="/frontend/assets/images/projects/{{ $p->image }}" width="50"></td>

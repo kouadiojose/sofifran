@@ -139,7 +139,8 @@ Route::get('/contact', [
 Route::post('/contact/sendmail', [
     PageController::class,
     'contactSendMail'
-])->name('contact-send-mail');
+])->middleware('throttle:10,1')->name('contact-send-mail');
+
 
 
 Route::get('/partenaires', [
@@ -166,7 +167,7 @@ Route::get('/lang/{locale}', [
 Route::post('/infolettre/subscribe', [
     PageController::class,
     'ValidInfolettre'
-])->name('infolettre-subscribe');
+])->middleware('throttle:10,1')->name('infolettre-subscribe');
 
 /**END ROUTE FRONTEND */
 

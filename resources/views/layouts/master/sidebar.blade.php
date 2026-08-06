@@ -549,13 +549,13 @@
 
           <li class="nav-item">
 
-            <a href="{{ route('admin-logout') }}" class="nav-link">
-
-              <i class="nav-icon far fa-circle text-danger"></i>
-
-              <p class="text">Déconnexion</p>
-
-            </a>
+            <form action="{{ route('admin-logout') }}" method="post" id="logout-form">
+              {{ csrf_field() }}
+              <a href="javascript:;" onclick="document.getElementById('logout-form').submit();" class="nav-link">
+                <i class="nav-icon far fa-circle text-danger"></i>
+                <p class="text">Déconnexion</p>
+              </a>
+            </form>
 
           </li>
 

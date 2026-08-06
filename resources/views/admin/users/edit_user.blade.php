@@ -97,7 +97,7 @@
                 <h2 class="card-title">Liste Utilisateur</h2>
                 <a href="{{ route('admin-role') }}" class="btn btn-secondary float-right" style="margin-left: 15px;"> <i class="fa fa-arrow-right"></i> Roles</a>
 
-                <a href="javascript();" data-toggle="modal" data-target="#change_password" data-id="{{ Auth::user()->id }}" class="btn btn-primary float-right"> <i class="fa fa-pencil-alt"></i> Changer mon mot de passe</a>
+                <a href="javascript();" data-toggle="modal" data-target="#change_password" data-id="{{ auth('admin')->id() }}" class="btn btn-primary float-right"> <i class="fa fa-pencil-alt"></i> Changer mon mot de passe</a>
               </div>
               <!-- /.card-header -->
               <div class="card-body">

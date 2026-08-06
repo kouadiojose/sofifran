@@ -45,14 +45,14 @@
               <div class="card-body">
                   
                   
-                    <form action="{{ route('admin-general-valide') }}" method="post">
+                    <form action="{{ route('admin-general-valide') }}" method="post" enctype="multipart/form-data">
                       
                         {{ csrf_field() }}
                         <div class="row">
                           
                           <div class="col-md-12">
                             <div class="form-group">
-                                <img src="/assets/img/{{ $setting->logo }}" width="250">
+                                <img src="/frontend/assets/images/{{ $setting->logo }}" width="250">
                                 <input type="hidden" value="{{ $setting->logo }}" name="img_up">
                                 <input type="hidden" value="{{ $setting->id }}" name="id">
                             </div>

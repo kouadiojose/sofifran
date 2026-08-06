@@ -108,7 +108,9 @@
 
             @endforeach
 
-
+            <div class="col-lg-12 col-md-12 d-flex justify-content-center">
+                {{ $blog->links() }}
+            </div>
 
         </div>
 

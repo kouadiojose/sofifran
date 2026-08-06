@@ -255,21 +255,11 @@
 
                 <div class="col-lg-4 col-md-12">
                     <aside class="widget-area" id="secondary">
-                        <section class="widget widget_search">
-                            <form class="search-form">
-                                <label>
-                                    <span class="screen-reader-text">{{ app()->getLocale() == 'fr' ? 'Rechercher pour': 'Search for' }}:</span>
-                                    <input type="search" class="search-field" placeholder="{{ app()->getLocale() == 'fr' ? 'Rechercher pour': 'Search for' }}...">
-                                </label>
-                                <button type="submit"><i class="fas fa-search"></i></button>
-                            </form>
-                        </section>
-
                         <section class="widget widget_pearo_posts_thumb">
                             <h3 class="widget-title">{{ app()->getLocale() == 'fr' ? 'Projets Populaires': 'Popular Projects' }}</h3>
                             @foreach( $projets as $b )
 	                            <article class="item">
-	                                <a href="{{ route('detail-blog', $b->slug) }}" class="thumb">
+	                                <a href="{{ route('detail-projets', $b->slug) }}" class="thumb">
 	                                    <span class="fullimage cover" style="background: url('/frontend/assets/images/projects/{{ $b->image }}');" role="img"></span>
 	                                </a>
 	                                <div class="info">

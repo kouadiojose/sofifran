@@ -60,6 +60,10 @@
             </div>
             @endforeach
 
+            <div class="col-lg-12 col-md-12 d-flex justify-content-center">
+                {{ $activites->links() }}
+            </div>
+
         </div>
     </div>
 </section>

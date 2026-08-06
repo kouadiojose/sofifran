@@ -104,7 +104,7 @@
 
                             <div class="form-group">
 
-                              <img src="/assets/images/resource/{{ $baniere->image }}" width="500">
+                              <img src="/frontend/assets/images/resource/{{ $baniere->image }}" width="500">
 
                               <input type="hidden" name="img_up" value="{{ $baniere->image }}">
 
