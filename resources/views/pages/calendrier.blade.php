@@ -61,14 +61,14 @@
                 <div class="single-events-box">
                     <div class="events-box">
                         <div class="events-image">
-                            <div class="image" style="background: url('/frontend/assets/images/ateliers/{{ $a->image }}');"></div>
+                            <div class="image" style="background: {{ $a->image ? "url('/frontend/assets/images/ateliers/" . $a->image . "')" : ($a->color ?: '#6f2da8') }};"></div>
                         </div>
 
                         <div class="events-content">
                             <div class="content">
                                 <h3><a href="{{ route('detail-atelier', $a->slug) }}">{{ app()->getLocale() == 'fr' ? $a->title_fr: $a->title_en }}</a></h3>
                                 <p><?= app()->getLocale() == 'fr' ? substr(strip_tags($a->description_fr), 0, 100): substr(strip_tags($a->description_en), 0, 100); ?>...</p>
-                                <span class="location"><i class="fi fi-br-calendar"></i> {{ $date->format('d/m/Y') }}</span>
+                                <span class="location"><i class="fi fi-br-calendar"></i> {{ $a->periode() }}</span>
                                 <a href="{{ route('detail-atelier', $a->slug) }}" class="join-now-btn">{{ app()->getLocale() == 'fr' ? 'Détails': 'Details' }}</a>
                             </div>
                         </div>

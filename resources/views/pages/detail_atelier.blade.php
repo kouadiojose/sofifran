@@ -44,7 +44,14 @@
                         <div class="article-content">
                             <div class="entry-meta">
                                 <ul>
-                                    <li><i class="fi fi-br-clock"></i> <a href="#">{{ date('d M Y', strtotime($atelier->created_at)) }}</a></li>
+                                    <li><i class="fi fi-br-calendar"></i> {{ $atelier->periode() }}</li>
+                                    <li>
+                                        @if($atelier->estAVenir())
+                                            <span class="badge badge-success" style="background:#28a745;color:#fff;padding:4px 10px;border-radius:4px;">{{ app()->getLocale() == 'fr' ? 'À venir' : 'Upcoming' }}</span>
+                                        @else
+                                            <span class="badge badge-secondary" style="background:#6c757d;color:#fff;padding:4px 10px;border-radius:4px;">{{ app()->getLocale() == 'fr' ? 'Évènement passé' : 'Past event' }}</span>
+                                        @endif
+                                    </li>
                                 </ul>
                             </div>
 
@@ -59,226 +66,42 @@
                         <div class="article-footer">
 
                             <div class="article-share">
+                                @php $shareUrl = urlencode(url()->current()); $shareTitle = urlencode(app()->getLocale() == 'fr' ? $atelier->title_fr : $atelier->title_en); @endphp
                                 <ul class="social">
                                     <li><span>{{ app()->getLocale() == 'fr' ? 'Partager': 'Share' }}:</span></li>
-                                    <li><a href="#" target="_blank"><i class="fi fi-brands-facebook"></i></a></li>
-                                    <li><a href="#" target="_blank"><i class="fi fi-brands-linkedin"></i></a></li>
-                                    <li><a href="#" target="_blank"><i class="fi fi-brands-instagram"></i></a></li>
+                                    <li><a href="https://www.facebook.com/sharer/sharer.php?u={{ $shareUrl }}" target="_blank" rel="noopener" title="Partager sur Facebook"><i class="fi fi-brands-facebook"></i></a></li>
+                                    <li><a href="https://www.linkedin.com/sharing/share-offsite/?url={{ $shareUrl }}" target="_blank" rel="noopener" title="Partager sur LinkedIn"><i class="fi fi-brands-linkedin"></i></a></li>
+                                    <li><a href="https://wa.me/?text={{ $shareTitle }}%20{{ $shareUrl }}" target="_blank" rel="noopener" title="Partager sur WhatsApp"><i class="fi fi-brands-whatsapp"></i></a></li>
                                 </ul>
                             </div>
                         </div>
 
-                        <!--
-                        <div class="comments-area">
-                            <h3 class="comments-title">2 Comments:</h3>
-
-                            <ol class="comment-list">
-                                <li class="comment">
-                                    <article class="comment-body">
-                                        <footer class="comment-meta">
-                                            <div class="comment-author vcard">
-                                                <img src="assets/img/client-image/1.jpg" class="avatar" alt="image">
-                                                <b class="fn">John Jones</b>
-                                                <span class="says">says:</span>
-                                            </div>
-
-                                            <div class="comment-metadata">
-                                                <a href="#">
-                                                    <time>April 24, 2024 at 10:59 am</time>
-                                                </a>
-                                            </div>
-                                        </footer>
-
-                                        <div class="comment-content">
-                                            <p>Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen.</p>
-                                        </div>
-
-                                        <div class="reply">
-                                            <a href="#" class="comment-reply-link">Reply</a>
-                                        </div>
-                                    </article>
-
-                                    <ol class="children">
-                                        <li class="comment">
-                                            <article class="comment-body">
-                                                <footer class="comment-meta">
-                                                    <div class="comment-author vcard">
-                                                        <img src="assets/img/client-image/2.jpg" class="avatar" alt="image">
-                                                        <b class="fn">Steven Smith</b>
-                                                        <span class="says">says:</span>
-                                                    </div>
-        
-                                                    <div class="comment-metadata">
-                                                        <a href="#">
-                                                            <time>April 24, 2024 at 10:59 am</time>
-                                                        </a>
-                                                    </div>
-                                                </footer>
-        
-                                                <div class="comment-content">
-                                                    <p>Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen.</p>
-                                                </div>
-        
-                                                <div class="reply">
-                                                    <a href="#" class="comment-reply-link">Reply</a>
-                                                </div>
-                                            </article>
-                                        </li>
-
-                                        <ol class="children">
-                                            <li class="comment">
-                                                <article class="comment-body">
-                                                    <footer class="comment-meta">
-                                                        <div class="comment-author vcard">
-                                                            <img src="assets/img/client-image/3.jpg" class="avatar" alt="image">
-                                                            <b class="fn">Sarah Taylor</b>
-                                                            <span class="says">says:</span>
-                                                        </div>
-            
-                                                        <div class="comment-metadata">
-                                                            <a href="#">
-                                                                <time>April 24, 2024 at 10:59 am</time>
-                                                            </a>
-                                                        </div>
-                                                    </footer>
-            
-                                                    <div class="comment-content">
-                                                        <p>Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen.</p>
-                                                    </div>
-            
-                                                    <div class="reply">
-                                                        <a href="#" class="comment-reply-link">Reply</a>
-                                                    </div>
-                                                </article>
-                                            </li>
-                                        </ol>
-                                    </ol>
-                                </li>
-
-                                <li class="comment">
-                                    <article class="comment-body">
-                                        <footer class="comment-meta">
-                                            <div class="comment-author vcard">
-                                                <img src="assets/img/client-image/4.jpg" class="avatar" alt="image">
-                                                <b class="fn">John Doe</b>
-                                                <span class="says">says:</span>
-                                            </div>
-
-                                            <div class="comment-metadata">
-                                                <a href="#">
-                                                    <time>April 24, 2024 at 10:59 am</time>
-                                                </a>
-                                            </div>
-                                        </footer>
-
-                                        <div class="comment-content">
-                                            <p>Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen.</p>
-                                        </div>
-
-                                        <div class="reply">
-                                            <a href="#" class="comment-reply-link">Reply</a>
-                                        </div>
-                                    </article>
-
-                                    <ol class="children">
-                                        <li class="comment">
-                                            <article class="comment-body">
-                                                <footer class="comment-meta">
-                                                    <div class="comment-author vcard">
-                                                        <img src="assets/img/client-image/1.jpg" class="avatar" alt="image">
-                                                        <b class="fn">James Anderson</b>
-                                                        <span class="says">says:</span>
-                                                    </div>
-        
-                                                    <div class="comment-metadata">
-                                                        <a href="#">
-                                                            <time>April 24, 2024 at 10:59 am</time>
-                                                        </a>
-                                                    </div>
-                                                </footer>
-        
-                                                <div class="comment-content">
-                                                    <p>Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen.</p>
-                                                </div>
-        
-                                                <div class="reply">
-                                                    <a href="#" class="comment-reply-link">Reply</a>
-                                                </div>
-                                            </article>
-                                        </li>
-                                    </ol>
-                                </li>
-                            </ol>
-
-                            <div class="comment-respond">
-                                <h3 class="comment-reply-title">Leave a Reply</h3>
-
-                                <form class="comment-form">
-                                    <p class="comment-notes">
-                                        <span id="email-notes">Your email address will not be published.</span>
-                                        Required fields are marked 
-                                        <span class="required">*</span>
-                                    </p>
-                                    <p class="comment-form-comment">
-                                        <label>Comment</label>
-                                        <textarea name="comment" id="comment" cols="45" rows="5" maxlength="65525" required="required"></textarea>
-                                    </p>
-                                    <p class="comment-form-author">
-                                        <label>Name <span class="required">*</span></label>
-                                        <input type="text" id="author" name="author" required="required">
-                                    </p>
-                                    <p class="comment-form-email">
-                                        <label>Email <span class="required">*</span></label>
-                                        <input type="email" id="email" name="email" required="required">
-                                    </p>
-                                    <p class="comment-form-url">
-                                        <label>Website</label>
-                                        <input type="url" id="url" name="url">
-                                    </p>
-                                    <p class="comment-form-cookies-consent">
-                                        <input type="checkbox" value="yes" name="wp-comment-cookies-consent" id="wp-comment-cookies-consent">
-                                        <label for="wp-comment-cookies-consent">Save my name, email, and website in this browser for the next time I comment.</label>
-                                    </p>
-                                    <p class="form-submit">
-                                        <input type="submit" name="submit" id="submit" class="submit" value="Post Comment">
-                                    </p>
-                                </form>
-                            </div>
-                        </div>-->
                     </div>
                 </div>
 
                 <div class="col-lg-4 col-md-12">
                     <aside class="widget-area" id="secondary">
-                        <section class="widget widget_search">
-                            <form class="search-form">
-                                <label>
-                                    <span class="screen-reader-text">{{ app()->getLocale() == 'fr' ? 'Rechercher pour': 'Search for' }}:</span>
-                                    <input type="search" class="search-field" placeholder="{{ app()->getLocale() == 'fr' ? 'Rechercher pour': 'Search for' }}...">
-                                </label>
-                                <button type="submit"><i class="fas fa-search"></i></button>
-                            </form>
-                        </section>
-
                         <section class="widget widget_pearo_posts_thumb">
-                            <h3 class="widget-title">{{ app()->getLocale() == 'fr' ? 'Activités Populaires': 'Popular Activity' }}</h3>
+                            <h3 class="widget-title">{{ app()->getLocale() == 'fr' ? 'Évènements à venir': 'Upcoming events' }}</h3>
 
-                            @foreach( $ateliers as $b )
+                            @forelse( $ateliers as $b )
 	                            <article class="item">
-	                                <a href="{{ route('detail-blog', $b->slug) }}" class="thumb">
+	                                <a href="{{ route('detail-atelier', $b->slug) }}" class="thumb">
 	                                	<?php if ($b->image != Null): ?>
-                                         <span class="fullimage cover" style="background: url('/frontend/assets/images/ateliers/{{ $b->image }}');" role="img"></span> 
+                                         <span class="fullimage cover" style="background: url('/frontend/assets/images/ateliers/{{ $b->image }}');" role="img"></span>
                                        <?php endif ?>
-	                                    
+
 	                                </a>
 	                                <div class="info">
-	                                    <time datetime="{{ $b->created_at }}">{{ date('d M Y', strtotime($b->created_at)) }}</time>
+	                                    <time datetime="{{ $b->start }}">{{ $b->start ? date('d/m/Y', strtotime($b->start)) : '' }}</time>
 	                                    <h4 class="title usmall"><a href="{{ route('detail-atelier', $b->slug) }}">{{ app()->getLocale() == 'fr' ? $b->title_fr: $b->title_en }}</a></h4>
 	                                </div>
 
 	                                <div class="clear"></div>
 	                            </article>
-                            @endforeach
+                            @empty
+                                <p>{{ app()->getLocale() == 'fr' ? 'Aucun évènement à venir pour le moment.': 'No upcoming events at the moment.' }}</p>
+                            @endforelse
                         </section>
                     </aside>
                 </div>
