@@ -8,10 +8,8 @@ use App\Models\Admin;
 use App\Models\Apropo;
 use App\Models\Atelier;
 use App\Models\Baniere;
-use App\Models\Bloc;
 use App\Models\Blog;
 use App\Models\Categorie_activitie;
-use App\Models\Compose;
 use App\Models\Contact;
 use App\Models\Donate;
 use App\Models\Galerie;
@@ -28,7 +26,6 @@ use App\Models\Projet;
 use App\Models\Publication;
 use App\Models\Role;
 use App\Models\Setting;
-use App\Models\Sondage;
 use App\Models\Sous_activite;
 use App\Models\Team;
 use App\Models\Temoignage;
@@ -474,37 +471,13 @@ class AdminController extends Controller
     }
     /** FIN PARTENAIRES **/
 
-    /** ENGAGEZ VOUS **/
-    public function EngagezVous()
-    {
-        return view('admin.engagez.index');
-    }
-    /** FIN ENGAGEZ VOUS **/
-
     /** ATELIERS **/
     public function atelier()
     {
-        $calendar    = Atelier::all();
-        $headerEvent = DB::table('entete_events')->first();
+        $calendar = Atelier::all();
 
         return view('admin.ateliers.calendar')
-            ->with('headerEvent', $headerEvent)
             ->with('calendar', $calendar);
-    }
-
-    public function EdtiteAtelierHeader(Request $request)
-    {
-        DB::table('entete_events')
-            ->where('id', $request->event_id)
-            ->update([
-                'title_fr' => $request->title_fr,
-                'title_en' => $request->title_en,
-                'nom_en'   => $request->nom_en,
-                'nom_fr'   => $request->nom_fr,
-            ]);
-
-        $request->session()->flash('msg', 'Vous avez modifié l\'entête avec succès!');
-        return back();
     }
 
     public function ListAtelier()
@@ -777,27 +750,10 @@ class AdminController extends Controller
     /** BLOG/ACTUALITES **/
     public function blog()
     {
-        $blog        = Blog::latest()->get();
-        $headerBlog  = DB::table('entete_blogs')->first();
+        $blog = Blog::latest()->get();
 
         return view('admin.blogs.list')
-            ->with('headerBlog', $headerBlog)
             ->with('blog', $blog);
-    }
-
-    public function EdtiteBlogHeader(Request $request)
-    {
-        DB::table('entete_blogs')
-            ->where('id', $request->blog_id)
-            ->update([
-                'title_fr' => $request->title_fr,
-                'title_en' => $request->title_en,
-                'nom_en'   => $request->nom_en,
-                'nom_fr'   => $request->nom_fr,
-            ]);
-
-        $request->session()->flash('msg', 'Vous avez modifié l\'entête avec succès!');
-        return back();
     }
 
     public function CreateBlog()
@@ -1184,33 +1140,10 @@ class AdminController extends Controller
         /** ACTIVITÉ **/
     public function activites()
     {
-        $galerie        = Activite::latest()->get();
-        $headerActivite = DB::table('entete_activites')->first();
+        $galerie = Activite::latest()->get();
 
         return view('admin.activites.list')
-            ->with('headerActivite', $headerActivite)
             ->with('galerie', $galerie);
-    }
-
-    public function EdtiteActiviteHeader(Request $request)
-    {
-        $name = ($request->hasFile('img'))
-            ? $this->uploadImage($request->file('img'), '/frontend/assets/images/activites/', 1920, 420)
-            : $request->img_up;
-
-        DB::table('entete_activites')
-            ->where('id', $request->activite_id)
-            ->update([
-                'title_fr' => $request->title_fr,
-                'title_en' => $request->title_en,
-                'nom_en'   => $request->nom_en,
-                'nom_fr'   => $request->nom_fr,
-                // 'cle_video' => $request->cle_video,
-                'image'    => $name,
-            ]);
-
-        $request->session()->flash('msg', 'Vous avez modifié l\'entête avec succès!');
-        return back();
     }
 
     public function CreateActivite()
@@ -1386,31 +1319,6 @@ class AdminController extends Controller
     }
     /** FIN ACTIVITÉ **/
 
-    /** SONDAGE **/
-    public function sondage()
-    {
-        $sondage = Sondage::first();
-
-        return view('admin.sondage.index')
-            ->with('sondage', $sondage);
-    }
-
-    public function SondageValide(Request $request)
-    {
-        Sondage::where('id', $request->sondage_id)->update([
-            'title_fr'       => $request->title_fr,
-            'title_en'       => $request->title_en,
-            'description_fr' => $request->description_fr,
-            'description_en' => $request->description_en,
-            'btn_name_fr'    => $request->btn_name_fr,
-            'btn_name_en'    => $request->btn_name_en,
-            'link'           => $request->link,
-        ]);
-
-        $request->session()->flash('msg', 'Vous avez modifié le sondage avec succès!');
-        return back();
-    }
-    /** FIN SONDAGE **/
 
     /** USERS **/
     public function users()
@@ -1615,40 +1523,6 @@ class AdminController extends Controller
     }
     /** FIN USERS **/
 
-    /** BLOCS **/
-    public function blocs()
-    {
-        $bloc = Bloc::all();
-
-        return view('admin.blocs.index')
-            ->with('bloc', $bloc);
-    }
-
-    public function Editbloc($id)
-    {
-        $bloc = Bloc::where('id', $id)->first();
-
-        return view('admin.blocs.edit')
-            ->with('bloc', $bloc);
-    }
-
-    public function EditblocValide(Request $request)
-    {
-        Bloc::where('id', $request->bloc_id)->update([
-            'title_fr'       => $request->title_fr,
-            'title_en'       => $request->title_en,
-            'description_fr' => $request->description_fr,
-            'description_en' => $request->description_en,
-            'btn_name_fr'    => $request->btn_name_fr,
-            'btn_name_en'    => $request->btn_name_en,
-            'icon'           => $request->icon,
-            'btn_link'       => $request->btn_link,
-        ]);
-
-        $request->session()->flash('msg', 'Vous avez modifié le Bloc avec succès!');
-        return back();
-    }
-    /** FIN BLOCS **/
 
     /** TEAM **/
     public function team()
@@ -1721,7 +1595,7 @@ class AdminController extends Controller
     /** A PROPOS **/
     public function apropos()
     {
-        $apropos = Apropo::first();
+        $apropos = Apropo::first() ?? Apropo::create([]);
 
         return view('admin.apropos.index')->with('apropos', $apropos);
     }
@@ -1729,16 +1603,21 @@ class AdminController extends Controller
     public function EditApropos(Request $request)
     {
         Apropo::where('id', $request->apropos_id)->update([
-            'nom_fr'        => $request->nom_fr,
-            'nom_en'        => $request->nom_en,
-            'title_fr'      => $request->title_fr,
-            'title_en'      => $request->title_en,
-            'description_fr'=> $request->description_fr,
-            'description_en'=> $request->description_en,
-            'cle_video'     => $request->cle_video,
+            'experience_fr' => $request->experience_fr,
+            'experience_en' => $request->experience_en,
+            'intro_fr'      => $request->intro_fr,
+            'intro_en'      => $request->intro_en,
+            'historique_fr' => $request->historique_fr,
+            'historique_en' => $request->historique_en,
+            'mission_fr'    => $request->mission_fr,
+            'mission_en'    => $request->mission_en,
+            'mandat_fr'     => $request->mandat_fr,
+            'mandat_en'     => $request->mandat_en,
+            'objectifs_fr'  => $request->objectifs_fr,
+            'objectifs_en'  => $request->objectifs_en,
         ]);
 
-        $request->session()->flash('msg', 'Vous avez modifié la section à propos avec succès!');
+        $request->session()->flash('msg', 'La page « Qui sommes-nous ? » a été mise à jour avec succès!');
         return back();
     }
     /** FIN A PROPOS **/

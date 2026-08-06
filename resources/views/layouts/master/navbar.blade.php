@@ -57,11 +57,6 @@
             <i class="far fa-circle nav-icon"></i> Blog/Actualités
           </a>
 
-          <div class="dropdown-divider"></div>
-          <a href="{{ route('admin-sondage') }}" class="dropdown-item">
-            <i class="far fa-circle nav-icon"></i> Sondage
-          </a>
-         
         </div>
       </li>
       @endcan
