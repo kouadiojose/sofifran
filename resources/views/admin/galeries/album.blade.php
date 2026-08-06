@@ -51,54 +51,81 @@
           @endif
 
           <!-- Ajout rapide de photos dans CET album -->
-          <div class="col-md-12 mb-3">
+          <div class="col-md-12">
             <div class="card card-primary card-outline">
-              <div class="card-body py-3">
-                <form method="POST" action="{{ route('admin-galerie-valid') }}" enctype="multipart/form-data" class="d-flex align-items-center flex-wrap">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fa fa-upload"></i> Ajouter des photos à cet album</h3>
+                <div class="card-tools">
+                  <a href="{{ route('admin-galerie') }}" class="btn btn-default btn-sm">
+                    <i class="fa fa-arrow-left"></i> Tous les albums
+                  </a>
+                </div>
+              </div>
+              <div class="card-body">
+                <form method="POST" action="{{ route('admin-galerie-valid') }}" enctype="multipart/form-data">
                   {{ csrf_field() }}
                   <input type="hidden" name="activite" value="{{ $album->id }}">
 
-                  <div class="custom-file flex-grow-1 mr-3 mb-2 mb-md-0" style="max-width: 480px;">
-                    <input type="file" name="photos[]" id="photos-input" class="custom-file-input" accept="image/*" multiple required>
-                    <label class="custom-file-label" for="photos-input" id="photos-label">Choisir des photos...</label>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="custom-file">
+                        <input type="file" name="photos[]" id="photos-input" class="custom-file-input" accept="image/*" multiple required>
+                        <label class="custom-file-label" for="photos-input" id="photos-label">Choisir des photos...</label>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-upload"></i> Ajouter à cet album
+                      </button>
+                    </div>
                   </div>
-
-                  <button type="submit" class="btn btn-primary mb-2 mb-md-0">
-                    <i class="fa fa-upload"></i> Ajouter à cet album
-                  </button>
-
-                  <a href="{{ route('admin-galerie') }}" class="btn btn-default ml-auto mb-2 mb-md-0">
-                    <i class="fa fa-arrow-left"></i> Tous les albums
-                  </a>
+                  <small class="text-muted d-block mt-2">Vous pouvez sélectionner plusieurs photos à la fois (jpg, png, webp — max 8 Mo chacune).</small>
                 </form>
-                <small class="text-muted">Vous pouvez sélectionner plusieurs photos à la fois (jpg, png, webp — max 8 Mo chacune).</small>
               </div>
             </div>
           </div>
 
           <!-- Grille des photos de l'album -->
-          @forelse($photos as $p)
-          <div class="col-lg-3 col-md-4 col-sm-6">
+          <div class="col-md-12">
             <div class="card">
-              <a href="/frontend/assets/images/gallery/photos/{{ $p->image }}" target="_blank" title="Voir en taille réelle">
-                <img src="/frontend/assets/images/gallery/photos/{{ $p->image }}" class="card-img-top" alt="Photo de l'album" style="height: 180px; object-fit: cover;">
-              </a>
-              <div class="card-body p-2 d-flex align-items-center justify-content-between">
-                <small class="text-muted">{{ $p->created_at ? date('d/m/Y', strtotime($p->created_at)) : '' }}</small>
-                <div>
-                  <a href="{{ route('admin-galerie-edit', $p->id) }}" class="btn btn-info btn-sm" title="Modifier / déplacer vers un autre album"><i class="fas fa-pencil-alt"></i></a>
-                  <a href="javascript:;" data-toggle="modal" data-target="#del_photo" data-id="{{ $p->id }}" class="btn btn-danger btn-sm" title="Supprimer"><i class="fas fa-trash"></i></a>
+              <div class="card-header">
+                <h3 class="card-title"><i class="far fa-images"></i> Photos de l'album</h3>
+                <div class="card-tools">
+                  <span class="badge badge-info">{{ $album->photos_count }} photo(s)</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="row">
+
+                  @forelse($photos as $p)
+                  <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card h-100 mb-0">
+                      <a href="/frontend/assets/images/gallery/photos/{{ $p->image }}" target="_blank" title="Voir en taille réelle">
+                        <img src="/frontend/assets/images/gallery/photos/{{ $p->image }}" class="card-img-top" alt="Photo de l'album" style="height: 180px; object-fit: cover;">
+                      </a>
+                      <div class="card-body p-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <small class="text-muted">{{ $p->created_at ? date('d/m/Y', strtotime($p->created_at)) : '' }}</small>
+                          <div class="btn-group">
+                            <a href="{{ route('admin-galerie-edit', $p->id) }}" class="btn btn-info btn-sm" title="Modifier / déplacer vers un autre album"><i class="fas fa-pencil-alt"></i></a>
+                            <a href="javascript:;" data-toggle="modal" data-target="#del_photo" data-id="{{ $p->id }}" class="btn btn-danger btn-sm" title="Supprimer"><i class="fas fa-trash"></i></a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  @empty
+                  <div class="col-12">
+                    <div class="alert alert-info mb-0">
+                      Cet album est vide. Utilisez le formulaire ci-dessus pour y ajouter des photos.
+                    </div>
+                  </div>
+                  @endforelse
+
                 </div>
               </div>
             </div>
           </div>
-          @empty
-          <div class="col-12">
-            <div class="alert alert-info">
-              Cet album est vide. Utilisez le formulaire ci-dessus pour y ajouter des photos.
-            </div>
-          </div>
-          @endforelse
 
         </div>
 

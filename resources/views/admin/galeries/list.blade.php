@@ -34,51 +34,60 @@
           </div>
           @endif
 
-          <div class="col-md-12 mb-3">
+          <div class="col-md-12">
             <div class="card">
-              <div class="card-body py-2 d-flex align-items-center justify-content-between flex-wrap">
-                <div class="flex-grow-1 mr-3" style="max-width: 420px;">
-                  <input type="text" id="album-search" class="form-control" placeholder="🔍 Rechercher un album...">
+              <div class="card-header">
+                <h3 class="card-title"><i class="far fa-images"></i> Albums photos</h3>
+                <div class="card-tools">
+                  <a href="{{ route('admin-galerie-create') }}" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Ajouter des photos</a>
                 </div>
-                <div>
-                  <a href="{{ route('admin-galerie-create') }}" class="btn btn-primary"><i class="fa fa-plus"></i> Ajouter des photos</a>
+              </div>
+
+              <div class="card-body">
+                <div class="row mb-3">
+                  <div class="col-md-5">
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                      </div>
+                      <input type="text" id="album-search" class="form-control" placeholder="Rechercher un album...">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row" id="albums-grid">
+
+                  @forelse($albums as $a)
+                  <div class="col-lg-3 col-md-4 col-sm-6 mb-4 album-card" data-title="{{ mb_strtolower($a->title_fr) }}">
+                    <div class="card h-100 mb-0">
+                      <a href="{{ route('admin-galerie-album', $a->id) }}">
+                        <img src="/frontend/assets/images/activites/{{ $a->image }}" class="card-img-top" alt="{{ $a->title_fr }}" style="height: 160px; object-fit: cover;">
+                      </a>
+                      <div class="card-body p-3 d-flex flex-column">
+                        <h5 class="text-truncate mb-3" style="font-size: 1rem;" title="{{ $a->title_fr }}">{{ $a->title_fr }}</h5>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                          <span class="badge {{ $a->photos_count > 0 ? 'badge-info' : 'badge-secondary' }}">
+                            <i class="far fa-images"></i> {{ $a->photos_count }}
+                          </span>
+                          <a href="{{ route('admin-galerie-album', $a->id) }}" class="btn btn-primary btn-sm">
+                            Ouvrir l'album
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  @empty
+                  <div class="col-12">
+                    <div class="alert alert-info">
+                      Aucune activité pour le moment. Les albums photos sont rattachés aux activités : créez d'abord une activité, puis ajoutez-y des photos.
+                    </div>
+                  </div>
+                  @endforelse
+
                 </div>
               </div>
             </div>
           </div>
-        </div>
-
-        <div class="row" id="albums-grid">
-
-          @forelse($albums as $a)
-          <div class="col-lg-3 col-md-4 col-sm-6 album-card" data-title="{{ mb_strtolower($a->title_fr) }}">
-            <div class="card">
-              <a href="{{ route('admin-galerie-album', $a->id) }}">
-                <img src="/frontend/assets/images/activites/{{ $a->image }}" class="card-img-top" alt="{{ $a->title_fr }}" style="height: 160px; object-fit: cover;">
-              </a>
-              <div class="card-body p-3">
-                <h3 class="card-title d-block mb-2" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;" title="{{ $a->title_fr }}">
-                  {{ $a->title_fr }}
-                </h3>
-                <div class="d-flex align-items-center justify-content-between">
-                  <span class="badge {{ $a->photos_count > 0 ? 'badge-info' : 'badge-secondary' }}">
-                    <i class="far fa-images"></i> {{ $a->photos_count }} photo(s)
-                  </span>
-                  <a href="{{ route('admin-galerie-album', $a->id) }}" class="btn btn-sm btn-outline-primary">
-                    Ouvrir l'album <i class="fas fa-arrow-right"></i>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-          @empty
-          <div class="col-12">
-            <div class="alert alert-info">
-              Aucune activité pour le moment. Les albums photos sont rattachés aux activités : créez d'abord une activité, puis ajoutez-y des photos.
-            </div>
-          </div>
-          @endforelse
-
         </div>
 
       </div><!--/. container-fluid -->
