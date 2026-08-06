@@ -12746,3 +12746,121 @@ Go Top CSS
     margin-right: 8px;
   }
 }
+
+/* === Ajustements Sofifran : cartes de documents (rapports, communiques...) === */
+.doc-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 22px rgba(26, 23, 137, 0.08);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.doc-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 34px rgba(26, 23, 137, 0.16);
+}
+.doc-cover {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1A1789 0%, #4a3aa8 60%, #FF6E5D 140%);
+}
+.doc-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .35s ease;
+}
+.doc-card:hover .doc-cover img { transform: scale(1.05); }
+.doc-cover-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: #ffffff;
+  padding: 20px;
+  text-align: center;
+}
+.doc-cover-placeholder i { font-size: 52px; opacity: .95; }
+.doc-cover-placeholder em {
+  font-style: normal;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  opacity: .9;
+}
+.doc-cover-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(26, 23, 137, 0.55);
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: .5px;
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.doc-card:hover .doc-cover-overlay { opacity: 1; }
+.doc-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 18px 18px 20px;
+}
+.doc-title {
+  font-size: 17px;
+  line-height: 1.35;
+  color: #1A1789;
+  margin: 0 0 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 46px;
+}
+.doc-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 14px;
+}
+.doc-meta i { margin-right: 4px; color: #FF6E5D; }
+.doc-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+.doc-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all .2s ease;
+}
+.doc-btn-primary {
+  background: #1A1789;
+  color: #ffffff !important;
+}
+.doc-btn-primary:hover { background: #FF6E5D; color: #ffffff !important; }
+.doc-btn-outline {
+  border: 2px solid #1A1789;
+  color: #1A1789 !important;
+}
+.doc-btn-outline:hover { border-color: #FF6E5D; color: #FF6E5D !important; }

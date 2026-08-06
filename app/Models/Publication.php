@@ -21,8 +21,47 @@ class Publication extends Model
     ];
 
     protected $fillable = [
-        'titre_fr', 'titre_en', 'description_fr', 'description_en', 'doc', 'date_pub', 'type',
+        'titre_fr', 'titre_en', 'description_fr', 'description_en', 'doc', 'date_pub', 'type', 'cover',
     ];
+
+    /**
+     * URL de l'image de couverture, ou null (la vue affiche alors une
+     * vignette stylisee).
+     */
+    public function getCoverUrlAttribute(): ?string
+    {
+        return $this->cover ? '/frontend/assets/images/publication/covers/' . $this->cover : null;
+    }
+
+    /**
+     * Poids lisible du document ("2,4 Mo"), null si le fichier est introuvable.
+     */
+    public function tailleFichier(): ?string
+    {
+        $chemin = public_path(ltrim($this->doc_url, '/'));
+
+        if (!is_file($chemin)) {
+            return null;
+        }
+
+        $octets = filesize($chemin);
+
+        if ($octets >= 1048576) {
+            return number_format($octets / 1048576, 1, ',', ' ') . ' Mo';
+        }
+
+        return max(1, (int) round($octets / 1024)) . ' Ko';
+    }
+
+    /**
+     * Date de publication lisible (la colonne est un varchar historique).
+     */
+    public function datePub(): ?string
+    {
+        $ts = strtotime((string) $this->date_pub);
+
+        return $ts ? date('d/m/Y', $ts) : null;
+    }
 
     /**
      * URL publique du document. Les anciens enregistrements stockent un simple

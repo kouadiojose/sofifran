@@ -175,6 +175,18 @@
 
                         </div>
 
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+
+                                <label>Image de couverture (optionnelle)</label>
+                                <input type="file" name="cover" accept="image/*" class="form-control">
+                                <small class="text-muted">Affichée sur la carte du document sur le site. Sans image, une vignette aux couleurs du site est générée.</small>
+
+                            </div>
+
+                        </div>
+
 
 
                         <div class="col-md-12">

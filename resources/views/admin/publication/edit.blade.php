@@ -177,6 +177,21 @@
 
                         </div>
 
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+
+                                <label>Image de couverture (optionnelle)</label>
+                                @if($pub->cover_url)
+                                  <br><img src="{{ $pub->cover_url }}" width="120" style="border-radius: 6px;" class="mb-2"><br>
+                                @endif
+                                <input type="file" name="cover" accept="image/*" class="form-control">
+                                <small class="text-muted">Laisser vide pour conserver. Sans image, une vignette aux couleurs du site est générée.</small>
+
+                            </div>
+
+                        </div>
+
 
 
                         <div class="col-md-12">

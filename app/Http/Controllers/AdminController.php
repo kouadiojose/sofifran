@@ -1753,15 +1753,21 @@ class AdminController extends Controller
             'date_pub'  => ['required', 'date'],
             'type'      => ['required', 'in:' . implode(',', array_keys(Publication::TYPES))],
             'file_name' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:20480'],
+            'cover'     => ['nullable', 'image', 'max:8192'],
         ]);
 
         $filePath = $this->uploadDocument($request->file('file_name'), '/frontend/assets/docs/publications/');
+
+        $cover = $request->hasFile('cover')
+            ? $this->uploadImage($request->file('cover'), '/frontend/assets/images/publication/covers/', 600, 450)
+            : null;
 
         Publication::create([
             'titre_fr' => $request->titre_fr,
             'titre_en' => $request->titre_en,
             'date_pub' => $request->date_pub,
             'type'     => $request->type,
+            'cover'    => $cover,
             'doc'      => $filePath,
         ]);
 
@@ -1784,17 +1790,25 @@ class AdminController extends Controller
             'date_pub'  => ['required', 'date'],
             'type'      => ['required', 'in:' . implode(',', array_keys(Publication::TYPES))],
             'file_name' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:20480'],
+            'cover'     => ['nullable', 'image', 'max:8192'],
         ]);
+
+        $publication = Publication::findOrFail($request->pub_id);
 
         $fileName = ($request->hasFile('file_name'))
             ? $this->uploadDocument($request->file('file_name'), '/frontend/assets/docs/publications/')
             : $request->file_name_up;
 
-        Publication::where('id', $request->pub_id)->update([
+        $cover = $request->hasFile('cover')
+            ? $this->uploadImage($request->file('cover'), '/frontend/assets/images/publication/covers/', 600, 450)
+            : $publication->cover;
+
+        $publication->update([
             'titre_fr' => $request->titre_fr,
             'titre_en' => $request->titre_en,
             'date_pub' => $request->date_pub,
             'type'     => $request->type,
+            'cover'    => $cover,
             'doc'      => $fileName,
         ]);
 
