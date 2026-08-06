@@ -1,356 +1,188 @@
 @extends('layouts.admin')
 
-
-
-@section('title', 'Ateliers')
-
+@section('title', 'Évènements / Calendrier')
 @section('link', 'atelier')
 
-
-
 @section('style')
-
-
-
-  <link rel="stylesheet" href="/assets/calendar/main.css">
-
-
-
+  <link rel="stylesheet" href="/frontend/assets/calendar/main.css">
+  <link rel="stylesheet" href="/admin/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="/admin/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
 @endsection
-
-
 
 @section('content')
 
-
-
     <!-- Content Header (Page header) -->
-
     <div class="content-header">
-
       <div class="container-fluid">
-
         <div class="row mb-2">
-
           <div class="col-sm-6">
-
-            <h1 class="m-0 text-dark">Nos Ateliers</h1>
-
-          </div><!-- /.col -->
-
+            <h1 class="m-0 text-dark">Évènements &amp; Calendrier</h1>
+          </div>
           <div class="col-sm-6">
-
             <ol class="breadcrumb float-sm-right">
-
               <li class="breadcrumb-item"><a href="{{ route('admin-dashboard') }}">Tableau de Bord</a></li>
-
-              <li class="breadcrumb-item active">Ateliers</li>
-
+              <li class="breadcrumb-item active">Évènements</li>
             </ol>
-
-          </div><!-- /.col -->
-
-        </div><!-- /.row -->
-
-      </div><!-- /.container-fluid -->
-
+          </div>
+        </div>
+      </div>
     </div>
-
     <!-- /.content-header -->
 
-
-
     <!-- Main content -->
-
     <section class="content">
-
       <div class="container-fluid">
-
-        <!-- Info boxes -->
-
-
-
         <div class="row">
 
           @if( session()->has('msg') )
-
           <div class="col-md-12">
-
             <div class="alert alert-success">{{ session()->get('msg') }}</div>
-
           </div>
-
           @endif
 
-
-
-          <div class="col-md-12">
-
-
-          </div>
-
-
-
-          <div class="col-md-12">
-
-            <div class="card">
-
+          <!-- Liste des evenements -->
+          <div class="col-lg-5">
+            <div class="card card-primary card-outline">
               <div class="card-header">
-
-                <h2 class="card-title">Nos Ateliers</h2>
-
-                <a style="margin-left: 5px;" href="{{ route('admin-atelier-list') }}" class="btn btn-secondary float-right"> <i class="fa fa-eye"></i> Voir la liste des ateliers</a>
-
-                <a href="{{ route('admin-atelier-create') }}" class="btn btn-primary float-right"> <i class="fa fa-plus"></i> Créer un nouveau</a>
-
-
-
+                <h3 class="card-title"><i class="fas fa-list"></i> Tous les évènements</h3>
+                <div class="card-tools">
+                  <a href="{{ route('admin-atelier-create') }}" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Créer un évènement</a>
+                </div>
               </div>
-
-              <!-- /.card-header -->
-
-              <div class="card-body">
-
-                  <div id="calendar"></div>
-
+              <div class="card-body p-0">
+                @if($calendar->isNotEmpty())
+                <table id="table_ateliers" class="table table-striped mb-0">
+                  <thead>
+                    <tr>
+                      <th>Évènement</th>
+                      <th style="width: 95px;">Date</th>
+                      <th style="width: 80px;">Statut</th>
+                      <th style="width: 90px;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach($calendar as $c)
+                    <tr>
+                      <td>
+                        <span class="d-inline-block rounded-circle mr-1" style="width: 10px; height: 10px; background: {{ $c->color ?: '#007bff' }};"></span>
+                        {{ \Illuminate\Support\Str::limit($c->title_fr, 40) }}
+                      </td>
+                      <td>{{ $c->start ? date('d/m/Y', strtotime($c->start)) : '-' }}</td>
+                      <td>
+                        @if($c->start >= now()->format('Y-m-d'))
+                          <span class="badge badge-success">À venir</span>
+                        @else
+                          <span class="badge badge-secondary">Passé</span>
+                        @endif
+                      </td>
+                      <td style="white-space: nowrap;">
+                        <a href="{{ route('admin-atelier-edit', $c->id) }}" class="btn btn-info btn-sm" title="Modifier"><i class="fas fa-pencil-alt"></i></a>
+                        <a href="javascript:;" data-toggle="modal" data-target="#del_atelier" data-id="{{ $c->id }}" class="btn btn-danger btn-sm" title="Supprimer"><i class="fas fa-trash"></i></a>
+                      </td>
+                    </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+                @else
+                <p class="p-3 mb-0 text-muted">Aucun évènement pour le moment. Créez-en un avec le bouton ci-dessus.</p>
+                @endif
               </div>
-
             </div>
-
           </div>
 
-          <!-- /.col -->
+          <!-- Calendrier -->
+          <div class="col-lg-7">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-calendar-alt"></i> Vue calendrier</h3>
+                <div class="card-tools">
+                  <small class="text-muted">Cliquez sur un évènement pour le modifier</small>
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="calendar"></div>
+              </div>
+            </div>
+          </div>
 
         </div>
-
         <!-- /.row -->
 
-
-
       </div><!--/. container-fluid -->
-
     </section>
-
     <!-- /.content -->
 
-
-
-    <!-- Modal -->
-
-    <div class="modal fade" id="createAtelier" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-
-      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-
+    <!-- Modal suppression -->
+    <div class="modal fade" id="del_atelier" tabindex="-1" data-backdrop="static" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-
           <div class="modal-header">
-
-            <h5 class="modal-title" id="exampleModalLongTitle">Créer un atelier</h5>
-
+            <h5 class="modal-title">Suppression de l'évènement</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-
               <span aria-hidden="true">&times;</span>
-
             </button>
-
           </div>
-
-          <form action="{{ route('admin-atelier-valid') }}" id="create_new" method="post">
-
-
-
+          <form action="{{ route('admin-atelier-delete') }}" method="post">
             {{ csrf_field() }}
-
+            <input type="hidden" name="del_id" id="id">
             <div class="modal-body">
-
-              <div class="row">
-
-                <div class="col-md-6">
-
-                  <div class="form-group">
-
-                    <label>Titre Evènement en Français *</label>
-
-                    <input type="text" name="title_fr" required="required" id="title_fr" class="form-control">
-
-                  </div>
-
-                </div>
-
-                <div class="col-md-6">
-
-                  <div class="form-group">
-
-                    <label>Titre Evènement en Anglais *</label>
-
-                    <input type="text" name="title_en" required="required" id="title_en" class="form-control">
-
-                  </div>
-
-                </div>
-
-                <div class="col-md-6">
-
-                  <div class="form-group">
-
-                    <label>Début *</label>
-
-                    <input type="date" name="start" required="required" id="start" class="form-control">
-
-                  </div>
-
-                </div>
-
-                <div class="col-md-6">
-
-                  <div class="form-group">
-
-                    <label>Fin *</label>
-
-                    <input type="date" name="end" required="required" id="end" class="form-control">
-
-                  </div>
-
-                </div>
-
-                <div class="col-md-6">
-
-                  <div class="form-group">
-
-                    <label>Description en Français</label>
-
-                    <textarea name="description_fr" rows="5" id="description_fr" class="form-control"></textarea>
-
-                  </div>
-
-                </div>
-
-                <div class="col-md-6">
-
-                  <div class="form-group">
-
-                    <label>Description en Anglais</label>
-
-                    <textarea name="description_en" rows="5" id="description_en" class="form-control"></textarea>
-
-                  </div>
-
-                </div>
-
-
-
-                <div class="col-md-12">
-
-                  <div class="form-group">
-
-                    <label>Couleur Evènement *</label>
-
-                    <select class="form-control" name="color" required="required">
-
-                      <option value="#dc3545">Rouge</option>
-
-                      <option value="#007bff">Bleu</option>
-
-                      <option value="#ffc107">Jaune</option>
-
-                      <option value="#28a745">Vert</option>
-
-                      <option value="#0b0001">Noir</option>
-
-                    </select>
-
-                  </div>
-
-                </div>
-
-              </div>
-
+              <p>Voulez-vous supprimer cet évènement ?</p>
             </div>
-
             <div class="modal-footer">
-
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-
-              <button type="submit" id="create" class="btn btn-primary">Créer</button>
-
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Non</button>
+              <button type="submit" class="btn btn-danger">Oui, supprimer</button>
             </div>
-
           </form>
-
-
-
         </div>
-
       </div>
-
     </div>
-
-
 
 @endsection
 
-
-
 @section('js')
-
-
-
-<script src='/assets/calendar/main.js'></script>
-
-<script src='/assets/calendar/locales-all.js'></script>
+<script src='/frontend/assets/calendar/main.js'></script>
+<script src='/frontend/assets/calendar/locales-all.js'></script>
+<script src="/admin/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/admin/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
 
 <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: 'fr',
+      height: 620,
+      events: [
+        @foreach($calendar as $c)
+        {
+          title: @json($c->title_fr),
+          start: '{{ $c->start }}',
+          color: '{{ $c->color ?: "#007bff" }}',
+          url: '{{ route('admin-atelier-edit', $c->id) }}',
+          @if ($c->end)
+          end: '<?= date("Y-m-d", strtotime($c->end . " +1 day")); ?>',
+          @endif
+        },
+        @endforeach
+      ],
+    });
+    calendar.render();
+  });
 
+  $(function () {
+    $('#table_ateliers').DataTable({
+      "responsive": true,
+      "autoWidth": false,
+      "pageLength": 10,
+      "lengthChange": false,
+      "order": [],
+      "language": { "search": "Rechercher :", "paginate": { "previous": "Préc.", "next": "Suiv." }, "info": "_TOTAL_ évènement(s)", "infoFiltered": "", "infoEmpty": "" }
+    });
 
-
-      document.addEventListener('DOMContentLoaded', function() {
-
-        var calendarEl = document.getElementById('calendar');
-
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-
-          initialView: 'dayGridMonth',
-
-          events: [
-
-            @foreach($calendar as $c)
-
-                {
-
-                    title : '{{ $c->title_fr }}',
-
-                    start : '{{ $c->start }}',
-
-                    color: "{{$c->color}}",
-
-                    url: "#",
-
-                    @if ($c->end)
-
-                            end: '<?= date("Y-m-d", strtotime($c->end. " +1 day")); ?>',
-
-                    @endif
-
-                },
-
-                
-
-            @endforeach
-
-        ],
-
-        });
-
-        calendar.render();
-
-        calendar.setOption('locale', 'fr');
-
-      });
-
-
-
+    $('#del_atelier').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget);
+      $(this).find('#id').val(button.data('id'));
+    });
+  });
 </script>
-
-
-
 @endsection

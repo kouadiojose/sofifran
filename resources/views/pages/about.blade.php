@@ -44,7 +44,7 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-5 col-md-12">
-                <img loading="lazy" style="border-radius: 15px;" src="/frontend/assets/images/resource/about_who.jpg" alt="image">
+                <img loading="lazy" style="border-radius: 15px;" src="{{ $apropos ? $apropos->imageUrl('image_intro', '/frontend/assets/images/resource/about_who.jpg') : '/frontend/assets/images/resource/about_who.jpg' }}" alt="image">
             </div>
 
             <div class="col-lg-7 col-md-12">
@@ -69,7 +69,7 @@
 
                 <div class="col-lg-6 col-md-6 col-sm-6">
                     <div class="about-text-box">
-                        <img loading="lazy" src="/frontend/assets/images/resource/mission.jpg" width="100%">
+                        <img loading="lazy" src="{{ $apropos ? $apropos->imageUrl('image_mission', '/frontend/assets/images/resource/mission.jpg') : '/frontend/assets/images/resource/mission.jpg' }}" width="100%">
                         <h3 class="mt-4">{{ app()->getLocale() == 'fr' ? 'Notre Mission' : 'Our Mission' }}</h3>
                         <p style="text-align: justify; font-size: 18px;">{{ $trad('mission') }}</p>
                     </div>
@@ -77,7 +77,7 @@
 
                 <div class="col-lg-6 col-md-6 offset-lg-0 offset-md-3 offset-sm-3 col-sm-6">
                     <div class="about-text-box">
-                        <img loading="lazy" src="/frontend/assets/images/resource/mandat.jpg" width="100%">
+                        <img loading="lazy" src="{{ $apropos ? $apropos->imageUrl('image_mandat', '/frontend/assets/images/resource/mandat.jpg') : '/frontend/assets/images/resource/mandat.jpg' }}" width="100%">
                         <h3 class="mt-4">{{ app()->getLocale() == 'fr' ? 'Mandat' : 'Mandate' }}</h3>
                         <p style="text-align: justify; font-size: 18px;">{{ $trad('mandat') }}</p>
                     </div>

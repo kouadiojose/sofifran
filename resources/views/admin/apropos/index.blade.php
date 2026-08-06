@@ -55,7 +55,7 @@
                 </div>
               </div>
 
-              <form method="POST" action="{{ route('admin-apropos-edit') }}">
+              <form method="POST" action="{{ route('admin-apropos-edit') }}" enctype="multipart/form-data">
                 {{ csrf_field() }}
                 <input type="hidden" name="apropos_id" value="{{ $apropos->id }}">
 
@@ -85,6 +85,32 @@
                       <div class="form-group">
                         <label>Texte d'introduction (EN)</label>
                         <textarea rows="6" class="form-control" name="intro_en">{{ old('intro_en', $apropos->intro_en) }}</textarea>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h5 class="text-primary border-bottom pb-2 mt-4">Images de la page</h5>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>Image d'introduction</label><br>
+                        <img src="{{ $apropos->imageUrl('image_intro', '/frontend/assets/images/resource/about_who.jpg') }}" width="100%" style="max-width: 260px; border-radius: 8px;" class="mb-2"><br>
+                        <input type="file" name="image_intro" accept="image/*" class="form-control">
+                        <small class="text-muted">Laisser vide pour conserver l'image actuelle.</small>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>Image de la Mission</label><br>
+                        <img src="{{ $apropos->imageUrl('image_mission', '/frontend/assets/images/resource/mission.jpg') }}" width="100%" style="max-width: 260px; border-radius: 8px;" class="mb-2"><br>
+                        <input type="file" name="image_mission" accept="image/*" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>Image du Mandat</label><br>
+                        <img src="{{ $apropos->imageUrl('image_mandat', '/frontend/assets/images/resource/mandat.jpg') }}" width="100%" style="max-width: 260px; border-radius: 8px;" class="mb-2"><br>
+                        <input type="file" name="image_mandat" accept="image/*" class="form-control">
                       </div>
                     </div>
                   </div>

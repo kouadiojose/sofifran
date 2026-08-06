@@ -45,6 +45,8 @@
                                 </ul>
                             </li>
                             <li class="nav-item"><a href="{{ route('activites') }}" class="nav-link"> {{ app()->getLocale() == 'fr' ? 'Activités': 'Activity' }}</a></li>
+
+                            <li class="nav-item"><a href="{{ route('atelier') }}" class="nav-link">{{ app()->getLocale() == 'fr' ? 'Évènements': 'Events' }}</a></li>
                             <li class="nav-item"><a href="#" class="nav-link">{{ app()->getLocale() == 'fr' ? 'Projets': 'Projects' }} <i class="flaticon-down-arrow"></i></a>
                                 <ul class="dropdown-menu">
                                     <li class="nav-item"><a href="{{ route('projets') }}" class="nav-link">{{ app()->getLocale() == 'fr' ? 'Projets en cours': 'Projects in progress' }}</a></li>

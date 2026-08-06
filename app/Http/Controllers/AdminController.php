@@ -471,10 +471,10 @@ class AdminController extends Controller
     }
     /** FIN PARTENAIRES **/
 
-    /** ATELIERS **/
+    /** ATELIERS / EVENEMENTS (page unique : liste + calendrier) **/
     public function atelier()
     {
-        $calendar = Atelier::all();
+        $calendar = Atelier::orderByDesc('start')->get();
 
         return view('admin.ateliers.calendar')
             ->with('calendar', $calendar);
@@ -482,8 +482,8 @@ class AdminController extends Controller
 
     public function ListAtelier()
     {
-        $calendar = Atelier::orderBy('id', 'DESC')->get();
-        return view('admin.ateliers.list')->with('calendar', $calendar);
+        // L'ancienne page "liste" est fusionnee avec la page calendrier.
+        return redirect()->route('admin-atelier');
     }
 
     public function CreateAtelier()
@@ -1602,7 +1602,22 @@ class AdminController extends Controller
 
     public function EditApropos(Request $request)
     {
-        Apropo::where('id', $request->apropos_id)->update([
+        $request->validate([
+            'image_intro'   => ['nullable', 'image', 'max:8192'],
+            'image_mission' => ['nullable', 'image', 'max:8192'],
+            'image_mandat'  => ['nullable', 'image', 'max:8192'],
+        ]);
+
+        $apropos = Apropo::findOrFail($request->apropos_id);
+
+        $images = [];
+        foreach (['image_intro', 'image_mission', 'image_mandat'] as $champ) {
+            $images[$champ] = $request->hasFile($champ)
+                ? $this->uploadImage($request->file($champ), '/frontend/assets/images/resource/', 850, 550)
+                : $apropos->{$champ};
+        }
+
+        $apropos->update($images + [
             'experience_fr' => $request->experience_fr,
             'experience_en' => $request->experience_en,
             'intro_fr'      => $request->intro_fr,
@@ -1620,6 +1635,7 @@ class AdminController extends Controller
         $request->session()->flash('msg', 'La page « Qui sommes-nous ? » a été mise à jour avec succès!');
         return back();
     }
+
     /** FIN A PROPOS **/
 
     /** INSCRIPTION MEH **/
