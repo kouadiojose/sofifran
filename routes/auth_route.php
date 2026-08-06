@@ -90,17 +90,12 @@ Route::prefix('admin-sofifran')->group(function () {
         Route::post('/infolettre/compose/valide', [AdminController::class, 'ComposeMail'])->name('admin-infolettre-create-valide');
         Route::post('/infolettre/delete', [AdminController::class, 'DelInfolettre'])->name('admin-infolettre-delete');
 
-        /*** Banieres & Slides ***/
+        /*** Banieres (une par page du site) ***/
         Route::get('/rubriques/banieres', [AdminController::class, 'banieres'])->name('admin-banieres');
         Route::get('/rubriques/banieres/create', [AdminController::class, 'banieresCreate'])->name('admin-banieres-create');
         Route::post('/rubriques/banieres/create/valid', [AdminController::class, 'banieresCreateValid'])->name('admin-banieres-create-valid');
-        Route::get('/rubriques/banieres/slide/{id}', [AdminController::class, 'EditSlide'])->name('admin-slide-edit');
-        Route::get('/rubriques/banieres/create/slide', [AdminController::class, 'CreateSlide'])->name('admin-slide-create');
-        Route::post('/rubriques/banieres/slide/create/valide', [AdminController::class, 'CreateValideSlide'])->name('admin-slide-create-valide');
-        Route::post('/rubriques/banieres/slide/valide', [AdminController::class, 'EditValideSlide'])->name('admin-slide-edit-valide');
         Route::get('/rubriques/banieres/page/{id}', [AdminController::class, 'EditBaniere'])->name('admin-banieres-edit');
         Route::post('/rubriques/banieres/page/valide', [AdminController::class, 'EditValideBaniere'])->name('admin-banieres-edit-valide');
-        Route::post('/rubriques/slide/delete', [AdminController::class, 'DelSlide'])->name('admin-slide-delete');
         Route::post('/rubriques/baniere/delete', [AdminController::class, 'DelBaniere'])->name('admin-baniere-delete');
 
         /*** General ***/

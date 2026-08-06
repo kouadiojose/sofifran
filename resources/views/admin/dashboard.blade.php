@@ -360,9 +360,9 @@
                     </div>
 
                     <div class="col-md-3 mb-3">
-                      <a style="width: 100%; height: 100%; font-size: 17px;" href="{{ route('admin-slide-create') }}" class="btn btn-app bg-primary">
-                          <i class="fas fa-list"></i>
-                          Ajouter une nouvelle banniere
+                      <a style="width: 100%; height: 100%; font-size: 17px;" href="{{ route('admin-banieres') }}" class="btn btn-app bg-primary">
+                          <i class="far fa-image"></i>
+                          Gérer les bannières des pages
                       </a>
                     </div>
 

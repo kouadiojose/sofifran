@@ -26,7 +26,7 @@
 
 <!-- Start Page Title Area -->
 
-<div class="page-title-area page-title-bg3">
+<div class="page-title-area page-title-bg3" @if(!empty($baniere) && $baniere->image) style="background-image: url('/frontend/assets/images/resource/{{ $baniere->image }}');" @endif>
 
     <div class="d-table">
 

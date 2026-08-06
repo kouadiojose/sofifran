@@ -109,9 +109,15 @@
 
                             <div class="form-group">
 
-                              <label>Page</label>
+                              <label>Page du site *</label>
 
-                              <input type="text" class="form-control" name="page" required>
+                              <select class="form-control" name="page" required>
+                                <option value="">— Sélectionner la page —</option>
+                                @foreach($pagesManquantes as $key => $label)
+                                  <option value="{{ $key }}" {{ old('page') == $key ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                              </select>
+                              <small class="text-muted">Seules les pages sans bannière sont proposées (une bannière par page).</small>
 
                             </div>
 

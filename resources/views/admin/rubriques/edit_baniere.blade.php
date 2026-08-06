@@ -130,9 +130,14 @@
 
                             <div class="form-group">
 
-                              <label>Page</label>
+                              <label>Page du site *</label>
 
-                              <input type="text" class="form-control" name="page" value="{{ $baniere->page }}">
+                              <select class="form-control" name="page" required>
+                                @foreach(\App\Models\Baniere::PAGE_LABELS as $key => $label)
+                                  <option value="{{ $key }}" {{ $baniere->page == $key ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                              </select>
+                              <small class="text-muted">La bannière s'affiche en haut de cette page.</small>
 
                             </div>
 

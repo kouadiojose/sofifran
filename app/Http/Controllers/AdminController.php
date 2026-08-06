@@ -29,7 +29,6 @@ use App\Models\Publication;
 use App\Models\Role;
 use App\Models\Setting;
 use App\Models\Sondage;
-use App\Models\Slider;
 use App\Models\Sous_activite;
 use App\Models\Team;
 use App\Models\Temoignage;
@@ -618,85 +617,52 @@ class AdminController extends Controller
     }
     /** FIN INFOLETTRE **/
 
-    /** BANIERES **/
+    /** BANIERES (une banniere par page du site) **/
     public function banieres()
     {
-        $slide   = Slider::latest()->get();
-        $baniere = Baniere::latest()->get();
+        $baniere = Baniere::orderBy('id')->get();
+
+        // Pages du catalogue qui n'ont pas encore de banniere.
+        $pagesManquantes = array_diff_key(
+            Baniere::PAGE_LABELS,
+            array_flip($baniere->pluck('page')->filter()->all())
+        );
 
         return view('admin.rubriques.banniere')
-            ->with('baniere', $baniere)
-            ->with('slide', $slide);
-    }
-
-    public function EditSlide($id)
-    {
-        $slide = Slider::where('id', $id)->first();
-        return view('admin.rubriques.edit_slide')->with('slide', $slide);
-    }
-
-    public function CreateSlide()
-    {
-        return view('admin.rubriques.create_slide');
-    }
-
-    public function CreateValideSlide(Request $request)
-    {
-        $name = $this->uploadImage($request->file('new_img'), '/frontend/assets/images/main-slider/', 1920, 800);
-
-        Slider::create([
-            'image'           => $name,
-            'title_fr'        => $request->title_fr,
-            'title_en'        => $request->title_en,
-            'description_fr'  => $request->description_fr,
-            'description_en'  => $request->description_en,
-            'btn_name_fr'     => $request->btn_name_fr,
-            'btn_name_en'     => $request->btn_name_en,
-            'btn_color'       => $request->btn_color,
-            'btn_link'        => $request->btn_link,
-            'orders'          => $request->orders,
-        ]);
-
-        $request->session()->flash('msg', 'Vous avez ajouté un slide!');
-        return back();
-    }
-
-    public function EditValideSlide(Request $request)
-    {
-        $name = ($request->hasFile('new_img'))
-            ? $this->uploadImage($request->file('new_img'), '/frontend/assets/images/main-slider/', 1920, 800)
-            : $request->img_up;
-
-        Slider::where('id', $request->id)->update([
-            'image'           => $name,
-            'title_fr'        => $request->title_fr,
-            'title_en'        => $request->title_en,
-            'description_fr'  => $request->description_fr,
-            'description_en'  => $request->description_en,
-            'btn_name_fr'     => $request->btn_name_fr,
-            'btn_name_en'     => $request->btn_name_en,
-            'btn_color'       => $request->btn_color,
-            'btn_link'        => $request->btn_link,
-            'orders'          => $request->orders,
-        ]);
-
-        $request->session()->flash('msg', 'Vous avez modifié un slide!');
-        return back();
+            ->with('pagesManquantes', $pagesManquantes)
+            ->with('baniere', $baniere);
     }
 
     public function EditBaniere($id)
     {
-        $baniere = Baniere::where('id', $id)->first();
+        $baniere = Baniere::findOrFail($id);
         return view('admin.rubriques.edit_baniere')->with('baniere', $baniere);
     }
 
     public function banieresCreate()
     {
-        return view('admin.rubriques.create_baniere');
+        $banieres = Baniere::pluck('page')->filter()->all();
+
+        $pagesManquantes = array_diff_key(Baniere::PAGE_LABELS, array_flip($banieres));
+
+        return view('admin.rubriques.create_baniere')
+            ->with('pagesManquantes', $pagesManquantes);
     }
 
     public function banieresCreateValid(Request $request)
     {
+        $request->validate([
+            'title_fr' => ['required', 'string'],
+            'title_en' => ['required', 'string'],
+            'page'     => ['required', 'in:' . implode(',', array_keys(Baniere::PAGE_LABELS))],
+            'img'      => ['required', 'image', 'max:8192'],
+        ]);
+
+        if (Baniere::where('page', $request->page)->exists()) {
+            $request->session()->flash('msg_error', 'Cette page a déjà une bannière : modifiez-la plutôt que d\'en créer une deuxième.');
+            return back()->withInput();
+        }
+
         $name = $this->uploadImage($request->file('img'), '/frontend/assets/images/resource/', 1920, 420);
 
         Baniere::create([
@@ -712,11 +678,20 @@ class AdminController extends Controller
 
     public function EditValideBaniere(Request $request)
     {
+        $request->validate([
+            'title_fr' => ['required', 'string'],
+            'title_en' => ['required', 'string'],
+            'page'     => ['required', 'in:' . implode(',', array_keys(Baniere::PAGE_LABELS))],
+            'new_img'  => ['nullable', 'image', 'max:8192'],
+        ]);
+
+        $baniere = Baniere::findOrFail($request->id);
+
         $name = ($request->hasFile('new_img'))
             ? $this->uploadImage($request->file('new_img'), '/frontend/assets/images/resource/', 1920, 420)
-            : $request->img_up;
+            : $baniere->image;
 
-        Baniere::where('id', $request->id)->update([
+        $baniere->update([
             'title_fr' => $request->title_fr,
             'title_en' => $request->title_en,
             'page'     => $request->page,
@@ -724,13 +699,6 @@ class AdminController extends Controller
         ]);
 
         $request->session()->flash('msg', 'Vous avez modifié une banière!');
-        return back();
-    }
-
-    public function DelSlide(Request $request)
-    {
-        Slider::findOrFail($request->del_id)->delete();
-        $request->session()->flash('msg_slide', 'Vous avez supprimé un slide avec succès!');
         return back();
     }
 
