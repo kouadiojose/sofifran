@@ -66,7 +66,6 @@ Route::prefix('admin-sofifran')->group(function () {
         Route::post('/temoignages/delete', [AdminController::class, 'DelTemoignage'])->name('admin-temoignage-delete');
 
         /*** Ateliers ***/
-        Route::post('/ateliers/header-atelier', [AdminController::class, 'EdtiteAtelierHeader'])->name('admin-edit-headerevent');
         Route::get('/ateliers', [AdminController::class, 'atelier'])->name('admin-atelier');
         Route::get('/ateliers/create', [AdminController::class, 'CreateAtelier'])->name('admin-atelier-create');
         Route::get('/ateliers/list', [AdminController::class, 'ListAtelier'])->name('admin-atelier-list');
@@ -103,7 +102,6 @@ Route::prefix('admin-sofifran')->group(function () {
         Route::post('/general/valide', [AdminController::class, 'GeneralValide'])->name('admin-general-valide');
 
         /*** Blog / Actualites ***/
-        Route::post('/ateliers/header-blog', [AdminController::class, 'EdtiteBlogHeader'])->name('admin-edit-headerblog');
         Route::get('/blog-actualite', [AdminController::class, 'blog'])->name('admin-blog');
         Route::get('/blog-actualite/create', [AdminController::class, 'CreateBlog'])->name('admin-blog-create');
         Route::get('/blog-actualite/edit/{id}', [AdminController::class, 'EditBlog'])->name('admin-blog-edit');
@@ -118,7 +116,6 @@ Route::prefix('admin-sofifran')->group(function () {
         /*** Galerie ***/
         Route::get('/galerie', [AdminController::class, 'galerie'])->name('admin-galerie');
         Route::get('/galerie/album/{id}', [AdminController::class, 'galerieAlbum'])->name('admin-galerie-album');
-        Route::post('/galerie/header-activite', [AdminController::class, 'EdtiteActiviteHeader'])->name('admin-edit-headeractivite');
         Route::get('/galerie/create', [AdminController::class, 'CreateGalerie'])->name('admin-galerie-create');
         Route::get('/galerie/edit/{id}', [AdminController::class, 'EditGalerie'])->name('admin-galerie-edit');
         Route::post('/galerie/edit/valid', [AdminController::class, 'EditValidGalerie'])->name('admin-galerie-edit-valid');
@@ -155,10 +152,6 @@ Route::prefix('admin-sofifran')->group(function () {
         Route::post('/categories/edit/valid', [AdminController::class, 'categorieEditValid'])->name('admin-categorie-edit-valid');
         Route::post('/categories/delete', [AdminController::class, 'categorieDel'])->name('admin-categorie-delete');
 
-        /*** Sondage ***/
-        Route::get('/sondage', [AdminController::class, 'sondage'])->name('admin-sondage');
-        Route::post('/sondage/valide', [AdminController::class, 'SondageValide'])->name('admin-sondage-valide');
-
         /*** Users, Roles & Permissions ***/
         Route::get('/users', [AdminController::class, 'users'])->name('admin-user');
         Route::get('/users/roles', [AdminController::class, 'roles'])->name('admin-role');
@@ -176,14 +169,6 @@ Route::prefix('admin-sofifran')->group(function () {
         Route::get('/users/roles/permissions/{id}', [AdminController::class, 'permission_single'])->name('admin-permission-single');
         Route::post('/users/roles/permissions-valid', [AdminController::class, 'ValidPermissions'])->name('admin-permission-valid');
         Route::get('/permission_per_role/{id}', [AdminController::class, 'permission_per_role'])->name('admin-permission-per-role');
-
-        /*** Blocs ***/
-        Route::get('/bloc', [AdminController::class, 'blocs'])->name('admin-bloc');
-        Route::get('/bloc/edit/{id}', [AdminController::class, 'Editbloc'])->name('admin-bloc-edit');
-        Route::post('/bloc/edit/valide', [AdminController::class, 'EditblocValide'])->name('admin-bloc-edit-valide');
-
-        /*** Engagez vous ***/
-        Route::get('/engagez_vous', [AdminController::class, 'EngagezVous'])->name('admin-engagez-vous');
 
         /*** Publication ***/
         Route::get('/publication', [AdminController::class, 'publication'])->name('admin-publication');

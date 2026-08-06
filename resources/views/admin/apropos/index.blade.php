@@ -5,109 +5,167 @@
 
 @section('content')
 
-<!-- Content Header (Page header) -->
+    <!-- Content Header (Page header) -->
     <div class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">A propos de nous</h1>
-          </div><!-- /.col -->
+            <h1 class="m-0 text-dark">Page « Qui sommes-nous ? »</h1>
+          </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="{{ route('admin-dashboard') }}">Tableau de Bord</a></li>
-              <li class="breadcrumb-item active">A propos de nous</li>
+              <li class="breadcrumb-item active">A propos</li>
             </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
+          </div>
+        </div>
+      </div>
     </div>
     <!-- /.content-header -->
 
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
-        <!-- Info boxes -->
-
         <div class="row">
+
           @if( session()->has('msg') )
           <div class="col-md-12">
             <div class="alert alert-success">{{ session()->get('msg') }}</div>
           </div>
           @endif
+
+          @if ($errors->any())
           <div class="col-md-12">
-            <div class="card">
-              <div class="card-header">
-                <h2 class="card-title">A propos de nous</h2>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body">
-                  
-                  <form action="{{ route('admin-apropos-edit') }}" method="post">
-
-                  		{{ csrf_field() }}
-                  		<input type="hidden" name="apropos_id" value="{{ $apropos->id }}">
-                        <div class="row">
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <label>Nom Rubrique en Français</label>
-                                  <input type="text" placeholder="Nom rubrique en Français" name="nom_fr" value="{{ $apropos->nom_fr }}" class="form-control">
-                              </div>
-                          </div>
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <label>Nom Rubrique en Anglais</label>
-                                  <input type="text" placeholder="Nom rubrique en Anglais" name="nom_en" value="{{ $apropos->nom_en }}" class="form-control">
-                              </div>
-                          </div>
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <label>Titre en Français</label>
-                                  <input type="text" value="{{ $apropos->title_fr }}" placeholder="Titre en Français" name="title_fr" class="form-control">
-                              </div>
-                          </div>
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <label>Titre en Anglais</label>
-                                  <input type="text" value="{{ $apropos->title_en }}" placeholder="Titre en Anglais" name="title_en" class="form-control">
-                              </div>
-                          </div>
-
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <label>Description en Français</label>
-                                  <textarea rows="5" class="form-control" name="description_fr" placeholder="Une description en Français">{{ $apropos->description_fr }}</textarea>
-                              </div>
-                          </div>
-
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <label>Description en Anglais</label>
-                                  <textarea rows="5" class="form-control" name="description_en" placeholder="Une description en Anglais">{{ $apropos->description_en }}</textarea>
-                              </div>
-                          </div>
-                          <div class="col-md-12">
-                              <div class="form-group">
-                                  <label>Clé de la vidéo</label>
-                                  <input type="text" class="form-control" name="cle_video" required="required" value="{{ $apropos->cle_video }}">
-                              </div>
-                          </div>
-                          <div class="col-md-12">
-                            <div class="form-group">
-                                <button type="submit" class="btn btn-primary">Valider</button>
-                            </div>
-                          </div>
-                        </div>
-
-                  </form>
-
-              </div>
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+              </ul>
             </div>
           </div>
-          <!-- /.col -->
-        </div>
-        <!-- /.row -->
+          @endif
 
-      </div><!--/. container-fluid -->
+          <div class="col-md-12">
+            <div class="card card-primary card-outline">
+              <div class="card-header">
+                <h3 class="card-title"><i class="far fa-edit"></i> Contenu de la page — chaque section correspond à un bloc de la page publique</h3>
+                <div class="card-tools">
+                  <a href="{{ route('about') }}" target="_blank" class="btn btn-default btn-sm"><i class="fas fa-external-link-alt"></i> Voir la page</a>
+                </div>
+              </div>
+
+              <form method="POST" action="{{ route('admin-apropos-edit') }}">
+                {{ csrf_field() }}
+                <input type="hidden" name="apropos_id" value="{{ $apropos->id }}">
+
+                <div class="card-body">
+
+                  <h5 class="text-primary border-bottom pb-2">Bloc d'introduction</h5>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Titre (FR)</label>
+                        <input type="text" class="form-control" name="experience_fr" value="{{ old('experience_fr', $apropos->experience_fr) }}" placeholder="Plus de 15 ans d'expérience">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Titre (EN)</label>
+                        <input type="text" class="form-control" name="experience_en" value="{{ old('experience_en', $apropos->experience_en) }}" placeholder="Over 15 years experience">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Texte d'introduction (FR)</label>
+                        <textarea rows="6" class="form-control" name="intro_fr">{{ old('intro_fr', $apropos->intro_fr) }}</textarea>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Texte d'introduction (EN)</label>
+                        <textarea rows="6" class="form-control" name="intro_en">{{ old('intro_en', $apropos->intro_en) }}</textarea>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h5 class="text-primary border-bottom pb-2 mt-4">Notre Historique</h5>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Historique (FR)</label>
+                        <textarea rows="10" class="form-control" name="historique_fr">{{ old('historique_fr', $apropos->historique_fr) }}</textarea>
+                        <small class="text-muted">Une ligne vide crée un nouveau paragraphe.</small>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Historique (EN)</label>
+                        <textarea rows="10" class="form-control" name="historique_en">{{ old('historique_en', $apropos->historique_en) }}</textarea>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h5 class="text-primary border-bottom pb-2 mt-4">Notre Mission</h5>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Mission (FR)</label>
+                        <textarea rows="5" class="form-control" name="mission_fr">{{ old('mission_fr', $apropos->mission_fr) }}</textarea>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Mission (EN)</label>
+                        <textarea rows="5" class="form-control" name="mission_en">{{ old('mission_en', $apropos->mission_en) }}</textarea>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h5 class="text-primary border-bottom pb-2 mt-4">Mandat</h5>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Mandat (FR)</label>
+                        <textarea rows="5" class="form-control" name="mandat_fr">{{ old('mandat_fr', $apropos->mandat_fr) }}</textarea>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Mandat (EN)</label>
+                        <textarea rows="5" class="form-control" name="mandat_en">{{ old('mandat_en', $apropos->mandat_en) }}</textarea>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h5 class="text-primary border-bottom pb-2 mt-4">Nos Objectifs</h5>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Objectifs (FR)</label>
+                        <textarea rows="8" class="form-control" name="objectifs_fr">{{ old('objectifs_fr', $apropos->objectifs_fr) }}</textarea>
+                        <small class="text-muted">Un objectif par ligne — chaque ligne devient une puce avec son icône sur la page.</small>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Objectifs (EN)</label>
+                        <textarea rows="8" class="form-control" name="objectifs_en">{{ old('objectifs_en', $apropos->objectifs_en) }}</textarea>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="card-footer">
+                  <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Enregistrer les modifications</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </section>
     <!-- /.content -->
 

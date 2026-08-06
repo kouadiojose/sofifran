@@ -43,51 +43,6 @@
           </div>
           @endif
           <div class="col-md-12">
-            <div class="card">
-              <div class="card-header">
-                <h2 class="card-title">Header Blogs / Actualités</h2>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body">
-                  <form action="{{ route('admin-edit-headerblog') }}" method="post">
-
-                      {{ csrf_field() }}
-                      <input type="hidden" name="blog_id" value="{{ $headerBlog->id }}">
-                      <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                              <label>Nom en français</label>
-                              <input type="text" value="{{ $headerBlog->nom_fr }}" class="form-control" name="nom_fr">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                              <label>Nom en Anglais</label>
-                              <input type="text" value="{{ $headerBlog->nom_en }}" class="form-control" name="nom_en">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                              <label>Titre en français</label>
-                              <input type="text" value="{{ $headerBlog->title_fr }}" class="form-control" name="title_fr">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                              <label>Titre en Anglais</label>
-                              <input type="text" value="{{ $headerBlog->title_en }}" class="form-control" name="title_en">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                              <button type="submit" class="btn-primary btn">Editer</button>
-                            </div>
-                        </div>
-                      </div>
-                      
-                  </form>
-              </div>
-            </div>
           </div>
 
           <div class="col-md-12">

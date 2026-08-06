@@ -599,7 +599,11 @@ class PageController extends Controller
         $title = "Qui sommes-nous";
         $baniere = Baniere::forPage('about');
 
+        // Contenu gere dans Admin > Rubriques > A propos.
+        $apropos = \App\Models\Apropo::first();
+
         return view('pages.about')
+        ->with('apropos', $apropos)
         ->with('baniere', $baniere);
 
     }
