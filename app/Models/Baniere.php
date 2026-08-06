@@ -63,15 +63,32 @@ class Baniere extends Model
      */
     public static function forPage(string $page): ?self
     {
-        $baniere = self::where('page', $page)->orderBy('id')->first();
+        // Cache 1h : la banniere est lue sur chaque page publique.
+        return \Illuminate\Support\Facades\Cache::remember(
+            'baniere.' . $page,
+            3600,
+            function () use ($page) {
+                $baniere = self::where('page', $page)->orderBy('id')->first();
 
-        if ($baniere) {
-            return $baniere;
+                if ($baniere) {
+                    return $baniere;
+                }
+
+                $id = self::PAGES[$page] ?? null;
+
+                return $id ? self::find($id) : null;
+            }
+        );
+    }
+
+    /**
+     * Invalide le cache des bannieres (appele apres toute modification admin).
+     */
+    public static function viderCache(): void
+    {
+        foreach (array_keys(self::PAGE_LABELS) as $page) {
+            \Illuminate\Support\Facades\Cache::forget('baniere.' . $page);
         }
-
-        $id = self::PAGES[$page] ?? null;
-
-        return $id ? self::find($id) : null;
     }
 
     public function getPageLabelAttribute(): string

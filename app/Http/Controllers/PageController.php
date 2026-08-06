@@ -49,10 +49,12 @@ class PageController extends Controller
 
         $blogs = Blog::orderBy('id', 'DESC')->take(6)->get();
 
-        // Compteurs de la section chiffres cles (avant : codes en dur dans la vue)
-        $nbProjets     = Projet::count();
-        $nbPartenaires = DB::table('partenaires')->count();
-        $nbBlogs       = Blog::count();
+        // Compteurs de la section chiffres cles, en cache 10 minutes
+        [$nbProjets, $nbPartenaires, $nbBlogs] = \Illuminate\Support\Facades\Cache::remember(
+            'accueil.compteurs',
+            600,
+            fn () => [Projet::count(), DB::table('partenaires')->count(), Blog::count()]
+        );
 
         // Evenements a venir ou en cours (logique centralisee dans le modele,
         // tolerante aux heures manquantes).
