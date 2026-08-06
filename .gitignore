@@ -25,3 +25,6 @@ yarn-error.log
 # Dump de base de donnees (contient des donnees sensibles - ne jamais commiter)
 /sofifran_db.sql
 *.sql
+
+# Variantes webp generees sur le serveur (php artisan sofifran:webp)
+public/frontend/assets/images/**/*.webp
