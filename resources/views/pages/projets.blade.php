@@ -38,7 +38,7 @@
             <div class="col-lg-4 col-md-6 col-sm-6">
                 <div class="services-box">
                     <div class="image">
-                        <img src="/frontend/assets/images/projects/{{$p->image}}" alt="image">
+                        <img loading="lazy" src="/frontend/assets/images/projects/{{$p->image}}" alt="image">
                     </div>
 
                     <div class="content">

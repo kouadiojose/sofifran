@@ -58,7 +58,7 @@
                 <a href="{{$p->link}}" target="_blank">
                 <div class="single-team-box">
                     <div class="image">
-                        <img width="100%" src="/frontend/assets/images/partenaires/{{$p->image}}" alt="image">
+                        <img loading="lazy" width="100%" src="/frontend/assets/images/partenaires/{{$p->image}}" alt="image">
                     </div>
                 </div>
                 </a>
@@ -78,7 +78,7 @@
                 <a href="{{$p->link}}" target="_blank">
                 <div class="single-team-box">
                     <div class="image">
-                        <img width="100%" src="/frontend/assets/images/partenaires/{{$p->image}}" alt="image">
+                        <img loading="lazy" width="100%" src="/frontend/assets/images/partenaires/{{$p->image}}" alt="image">
                     </div>
                 </div>
                 </a>
@@ -97,7 +97,7 @@
                 <a href="{{$p->link}}" target="_blank">
                 <div class="single-team-box">
                     <div class="image">
-                        <img width="100%" src="/frontend/assets/images/partenaires/{{$p->image}}" alt="image">
+                        <img loading="lazy" width="100%" src="/frontend/assets/images/partenaires/{{$p->image}}" alt="image">
                     </div>
                 </div>
                 </a>
@@ -116,7 +116,7 @@
                 <a href="{{$p->link}}" target="_blank">
                 <div class="single-team-box">
                     <div class="image">
-                        <img width="100%" src="/frontend/assets/images/partenaires/{{$p->image}}" alt="image">
+                        <img loading="lazy" width="100%" src="/frontend/assets/images/partenaires/{{$p->image}}" alt="image">
                     </div>
                 </div>
                 </a>

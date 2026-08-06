@@ -85,6 +85,29 @@
                             </div>
                         </div>
 
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Lien du contenu complet (bouton « Je continue »)</label>
+                                <input type="url" class="form-control" name="link" id="popup-link" value="{{ old('link', $popup->link) }}" placeholder="https://... ou choisir à droite">
+                                <small class="text-muted">Laisser vide pour renvoyer vers la page Infolettres.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Ou choisir une page / un article du site</label>
+                                <select class="form-control" id="popup-link-picker">
+                                    <option value="">— Sélectionner pour remplir le lien —</option>
+                                    @foreach($linkTargets as $groupe => $items)
+                                    <optgroup label="{{ $groupe }}">
+                                        @foreach($items as $url => $label)
+                                        <option value="{{ $url }}" {{ $popup->link == $url ? 'selected' : '' }}>{{ $label }}</option>
+                                        @endforeach
+                                    </optgroup>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
                         <?php if ( isset($popup->image) ): ?>
                           <div class="col-md-12">
                             <div class="form-group">
@@ -132,7 +155,11 @@
 @endsection
 
 @section('js')
-
-
-
+<script>
+  document.getElementById('popup-link-picker').addEventListener('change', function () {
+    if (this.value) {
+      document.getElementById('popup-link').value = this.value;
+    }
+  });
+</script>
 @endsection

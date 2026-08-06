@@ -2,7 +2,7 @@
         <!-- Start Footer Area -->
         <footer class="footer-area">
             <div class="container">
-                <div class="subscribe-area">
+                <div class="subscribe-area" id="newsletter">
                     <div class="row align-items-center">
                         <div class="col-lg-5 col-md-12">
                             <div class="subscribe-content">

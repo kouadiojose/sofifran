@@ -41,7 +41,7 @@
             <div class="col-lg-4 col-md-6 col-sm-6">
                 <div class="single-team-box">
                     <div class="image">
-                        <img width="100%" src="/frontend/assets/images/team/{{$t->image}}" alt="image">
+                        <img loading="lazy" width="100%" src="/frontend/assets/images/team/{{$t->image}}" alt="image">
                     </div>
 
                     <div class="content">
@@ -60,7 +60,7 @@
             <div class="col-lg-4 col-md-6 col-sm-6">
                 <div class="single-team-box">
                     <div class="image">
-                        <img width="100%" src="/frontend/assets/images/team/{{$t->image}}" alt="image">
+                        <img loading="lazy" width="100%" src="/frontend/assets/images/team/{{$t->image}}" alt="image">
                     </div>
 
                     <div class="content">

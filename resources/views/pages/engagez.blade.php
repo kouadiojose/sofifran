@@ -45,7 +45,7 @@
 
                 <div class="col-lg-6 col-md-12">
                     <div class="image text-center">
-                        <img src="https://sofifran.org/assets/images/resource/Our_Mission.jpg" alt="image">
+                        <img src="/frontend/assets/images/resource/Our_Mission.jpg" alt="image">
                     </div>
                 </div>
             </div>

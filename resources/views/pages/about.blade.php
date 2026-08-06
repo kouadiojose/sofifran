@@ -65,7 +65,7 @@
 
                 <div class="col-lg-6 col-md-6 col-sm-6">
                     <div class="about-text-box">
-                        <img src="https://sofifran.org/assets/images/resource/mission.jpg" width="100%">
+                        <img src="/frontend/assets/images/resource/mission.jpg" width="100%">
                         <h3 class="mt-4">{{ app()->getLocale() == 'fr' ? 'Notre Mission' : 'Our Mission' }}</h3>
                         <p style="text-align: justify; font-size: 18px;">{{ app()->getLocale() == 'fr' ? 'SOFIFRAN est une plateforme francophone qui vise la promotion et la participation des immigrants dans les secteurs économique et social, tout en favorisant leur épanouissement sur le plan artistique et culturel pour une meilleure intégration au Canada.' : 'Sofifran is a French -speaking platform that targets the promotion and participation of immigrants in the economic and social sectors, while promoting their artistic and cultural development for better integration in Canada.' }}</p>
                     </div>
@@ -73,7 +73,7 @@
 
                 <div class="col-lg-6 col-md-6 offset-lg-0 offset-md-3 offset-sm-3 col-sm-6">
                     <div class="about-text-box">
-                        <img src="https://sofifran.org/assets/images/resource/mandat.jpg" width="100%">
+                        <img src="/frontend/assets/images/resource/mandat.jpg" width="100%">
                         <h3 class="mt-4">{{ app()->getLocale() == 'fr' ? 'Mandat' : 'Mandate' }}</h3>
                         <p style="text-align: justify; font-size: 18px;">{{ app()->getLocale() == 'fr' ? 'Rassembler, valoriser, promouvoir, représenter et utiliser rationnellement les compétences acquises des femmes immigrantes francophones de Niagara /Hamilton et leur servir de support dans le domaine de développement social, économique éducatif et culturel, et ce en vue de se prendre et/ou de prendre leurs familles en charge.' : 'Gather, enhance, promote, rationally represent and use the skills acquired by French -speaking immigrant women from Niagara /Hamilton and serve them as a support in the field of social, educational and cultural development, and this in order to take and /or take their families in charge.' }}</p>
                     </div>

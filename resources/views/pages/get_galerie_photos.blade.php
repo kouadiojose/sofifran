@@ -82,7 +82,7 @@
 
                             <div class="case-study-details-image">
 
-                                <img width="100%" src="/frontend/assets/images/gallery/photos/{{ $g->image }}" alt="projects">
+                                <img loading="lazy" width="100%" src="/frontend/assets/images/gallery/photos/{{ $g->image }}" alt="projects">
 
                                 <a href="/frontend/assets/images/gallery/photos/{{ $g->image }}" class="popup-btn"><i class="fi fi-br-plus"></i></a>
 

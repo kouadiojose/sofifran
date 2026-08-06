@@ -84,7 +84,7 @@
 
                         <div class="image">
 
-                            <img src="/frontend/assets/images/activites/{{$p->image}}" alt="image">
+                            <img loading="lazy" src="/frontend/assets/images/activites/{{$p->image}}" alt="image">
 
                         </div>
 

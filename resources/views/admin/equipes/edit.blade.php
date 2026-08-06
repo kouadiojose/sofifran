@@ -169,9 +169,22 @@
                                   <label>Type de membre *</label>
 
                                   <select class="form-control" name="type_membre" required>
-                                    <option <?php if($team->type == 'Conseil d\'administration'){ echo "selected"; } ?> value="Conseil d'administration">Conseil d'administration</option>
-                                    <option <?php if($team->type == 'Personnel'){ echo "selected"; } ?> value="Personnel">Personnel</option>
+                                    <option {{ $team->type_membre == "Conseil d'administration" ? 'selected' : '' }} value="Conseil d'administration">Conseil d'administration</option>
+                                    <option {{ $team->type_membre == 'Personnel' ? 'selected' : '' }} value="Personnel">Personnel</option>
                                   </select>
+
+                              </div>
+
+                          </div>
+
+                          <div class="col-md-4">
+
+                              <div class="form-group">
+
+                                  <label>Ordre d'affichage</label>
+
+                                  <input type="number" min="0" value="{{ old('ordre', $team->ordre ?? 0) }}" name="ordre" class="form-control">
+                                  <small class="text-muted">Les plus petits numéros s'affichent en premier.</small>
 
                               </div>
 

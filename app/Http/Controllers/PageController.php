@@ -299,7 +299,9 @@ class PageController extends Controller
                 : 'Your email has been successfully registered. Thank you!');
         }
 
-        return back();
+        // Revenir ancre sur le formulaire (en bas de page) pour que le
+        // message de confirmation soit visible.
+        return back()->withFragment('newsletter');
     }
 
 

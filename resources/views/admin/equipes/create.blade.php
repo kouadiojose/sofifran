@@ -160,6 +160,19 @@
                           </div>
 
 
+                          <div class="col-md-4">
+
+                              <div class="form-group">
+
+                                  <label>Ordre d'affichage</label>
+
+                                  <input type="number" min="0" value="{{ old('ordre', 0) }}" name="ordre" class="form-control">
+                                  <small class="text-muted">Les plus petits numéros s'affichent en premier.</small>
+
+                              </div>
+
+                          </div>
+
                           <div class="col-md-6">
 
                               <div class="form-group">
