@@ -34,5 +34,15 @@ return Application::configure(basePath: dirname(__DIR__))
         });
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Envoi de fichiers depassant post_max_size : PHP rejette la requete
+        // avant meme la validation Laravel. On renvoie l'utilisateur sur le
+        // formulaire avec un message clair au lieu de la page d'erreur.
+        $exceptions->render(function (\Illuminate\Http\Exceptions\PostTooLargeException $e, \Illuminate\Http\Request $request) {
+            $max = ini_get('post_max_size');
+
+            return redirect()->back()->withErrors([
+                'upload' => "L'envoi est trop volumineux : le serveur accepte au maximum {$max} par envoi. "
+                    . "Réduisez le nombre de photos ou envoyez-les en plusieurs fois.",
+            ]);
+        });
     })->create();

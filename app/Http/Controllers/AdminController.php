@@ -863,14 +863,38 @@ class AdminController extends Controller
             ->with('albums', $albums);
     }
 
+    /**
+     * Convertit une valeur php.ini du type "8M" / "2G" en octets.
+     */
+    private function iniToBytes(string $value): int
+    {
+        $value = trim($value);
+        $unit  = strtolower(substr($value, -1));
+        $num   = (float) $value;
+
+        return (int) match ($unit) {
+            'g' => $num * 1024 * 1024 * 1024,
+            'm' => $num * 1024 * 1024,
+            'k' => $num * 1024,
+            default => $num,
+        };
+    }
+
     public function galerieAlbum($id)
     {
         $album  = Activite::withCount('photos')->findOrFail($id);
         $photos = Galerie_photo::where('galerie_id', $id)->orderBy('id', 'DESC')->get();
 
+        // Limites d'upload effectives du serveur, affichees et verifiees
+        // cote client pour eviter un rejet PHP (PostTooLargeException).
+        $maxPostBytes = $this->iniToBytes(ini_get('post_max_size'));
+        $maxFileBytes = $this->iniToBytes(ini_get('upload_max_filesize'));
+
         return view('admin.galeries.album')
             ->with('album', $album)
-            ->with('photos', $photos);
+            ->with('photos', $photos)
+            ->with('maxPostBytes', $maxPostBytes)
+            ->with('maxFileBytes', $maxFileBytes);
     }
 
     public function CreateGalerie()

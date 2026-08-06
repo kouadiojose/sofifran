@@ -79,7 +79,12 @@
                       </button>
                     </div>
                   </div>
-                  <small class="text-muted d-block mt-2">Vous pouvez sélectionner plusieurs photos à la fois (jpg, png, webp — max 8 Mo chacune).</small>
+                  <small class="text-muted d-block mt-2">
+                    Vous pouvez sélectionner plusieurs photos à la fois (jpg, png, webp).
+                    Limites du serveur : {{ round($maxFileBytes / 1048576) }} Mo par photo,
+                    {{ round($maxPostBytes / 1048576) }} Mo par envoi au total.
+                  </small>
+                  <small id="upload-warning" class="text-danger d-none d-block mt-1"></small>
                 </form>
               </div>
             </div>
@@ -169,10 +174,36 @@
       $(this).find('#id').val(button.data('id'));
     });
 
-    // Affiche le nombre de fichiers selectionnes sur l'input d'upload.
+    // Affiche le nombre de fichiers selectionnes et verifie le poids total
+    // AVANT l'envoi, pour eviter le rejet PHP (PostTooLargeException).
+    var MAX_POST = {{ $maxPostBytes }};   // post_max_size
+    var MAX_FILE = {{ $maxFileBytes }};   // upload_max_filesize
+    var MARGIN   = 1024 * 512;            // marge pour les entetes du formulaire
+
     $('#photos-input').on('change', function () {
-      var n = this.files.length;
-      $('#photos-label').text(n > 0 ? n + ' photo(s) sélectionnée(s)' : 'Choisir des photos...');
+      var files = this.files;
+      var total = 0, tooBig = [];
+
+      for (var i = 0; i < files.length; i++) {
+        total += files[i].size;
+        if (files[i].size > MAX_FILE) tooBig.push(files[i].name);
+      }
+
+      var totalMo = (total / 1048576).toFixed(1);
+      $('#photos-label').text(files.length > 0
+        ? files.length + ' photo(s) — ' + totalMo + ' Mo'
+        : 'Choisir des photos...');
+
+      var warning = '';
+      if (tooBig.length) {
+        warning = 'Photo(s) trop lourde(s) (max ' + Math.round(MAX_FILE / 1048576) + ' Mo) : ' + tooBig.join(', ');
+      } else if (total + MARGIN > MAX_POST) {
+        warning = 'Poids total (' + totalMo + ' Mo) supérieur à la limite du serveur ('
+          + Math.round(MAX_POST / 1048576) + ' Mo par envoi). Envoyez les photos en plusieurs fois.';
+      }
+
+      $('#upload-warning').text(warning).toggleClass('d-none', warning === '');
+      $(this).closest('form').find('button[type=submit]').prop('disabled', warning !== '');
     });
   });
 </script>
